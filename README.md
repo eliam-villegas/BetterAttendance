@@ -1,10 +1,2 @@
 # BetterAttendance
 Repositorio para proyecto de Ingeniería de Software 2
-
-# Hola Mundo
-Hola mundooo
-
-# Adios Mundo
-Adios munde
-
-A
