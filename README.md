@@ -44,3 +44,25 @@ El sistema de gestión actual es anticuado y limitado, lo que imposibilita optim
 El principal problema radica en la falta de integración y actualización del sistema actual, lo que dificulta la gestión eficiente de la asistencia, los turnos y el ausentismo del personal. 
 La solución podría consistir en implementar un sistema más moderno y adaptable que permita la sincronización automática de datos entre los distintos dispositivos de marcación (relojes y huelleros). 
 Este sistema debe unificar la información en tiempo real, permitiendo la correcta identificación de turnos, horas trabajadas, y ausencias. Además, debe generar reportes claros sobre horas extras y atrasos, todo ello dentro del marco de las leyes vigentes que regulan los contratos y jornadas laborales.
+
+
+## compose.yml
+Steps:
+
+    Login Service (auth):
+        This service runs an authentication server (for example, written in Node.js, Python, or any other backend framework).
+        It listens on port 5000 (or any port you define).
+        The web app can call this service for user login, sending the credentials, and on success, the user can be redirected back to the main app, or the service can return an authentication token (e.g., JWT) that the main app will use.
+
+    Main Web App (web):
+        The web app listens on port 8080.
+        It sends login requests to the auth service, using the environment variable AUTH_SERVICE_URL (which points to the internal auth service within Docker Compose).
+        Once login is successful, the user can be redirected to the main app (or tokens can be passed between services for authentication).
+
+How Communication Works:
+
+    Docker Compose creates an internal network called webapp-network, and each service can access others via their service names (web and auth in this case).
+    When the web app needs to authenticate a user, it makes a request to http://auth:5000/login or a similar API endpoint to perform login operations.
+    Once authentication is successful, the auth service can either:
+        Redirect the user back to the main app using an HTTP redirect.
+        Return a JWT or session cookie to the web app, which will handle user sessions. 

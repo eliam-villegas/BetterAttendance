@@ -14,7 +14,7 @@ services:
 
   backend:
     build:
-      context: ./backend
+      context: ./server
       dockerfile: dockerfile
     ports:
       - "5000:5000"
@@ -28,10 +28,17 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: ./web
       dockerfile: dockerfile
     ports:
       - "3000:3000"
+    networks:
+      - app-network
+
+  auth:
+    build: ./auth
+    ports:
+      - "5001:5001"
     networks:
       - app-network
 
