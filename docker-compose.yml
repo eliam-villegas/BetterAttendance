@@ -1,28 +1,12 @@
 version: '3.8'
 
 services:
-  db:
-    image: mongo:5.0
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: mongo
-      MONGO_INITDB_ROOT_PASSWORD: password
-      MONGO_INITDB_DATABASE: app-db
-    volumes:
-      - db_data:/data/db
-    networks:
-      - app-network
-
   backend:
     build:
       context: ./server
       dockerfile: dockerfile
     ports:
       - "5000:5000"
-    depends_on:
-      - db
-    environment:
-      FLASK_ENV: development
-      DATABASE_URL: mongodb://mongo:password@db:27017/app-db
     networks:
       - app-network
 
