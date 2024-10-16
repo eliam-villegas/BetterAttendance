@@ -20,7 +20,7 @@ jobs:
     - uses: actions/setup-python@v5
       with:
         python-version: '3.12' 
-    - run: python app.py
+    - run: python /backend/app.py
     - name: 'Hello World'
       run: echo "Hello World"
     - name: Dime la fecha
