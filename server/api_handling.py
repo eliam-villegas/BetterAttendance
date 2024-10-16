@@ -4,13 +4,16 @@ from flask import Flask, request, jsonify, send_file
 from werkzeug.utils import secure_filename
 import subprocess
 
-UPLOAD_FOLDER = './uploads'
+UPLOAD_FOLDER = './logs'
 SCRIPT_FOLDER = './scripts'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SCRIPT_FOLDER'] = SCRIPT_FOLDER
 
+# TODO:
+#
+#
 @app.route('/_handle', methods=['POST'])
 def _handle():
     if 'file' not in request.files or 'script' not in request.form:
@@ -38,4 +41,3 @@ def _handle():
         return jsonify({"error": "Script error", "details": str(e)}), 500
 
     return 'referencia al archivo'
-    #return send_file(file_path, as_attachment=True, attachment_filename=filename), 200, {"Change-ID": change_id}

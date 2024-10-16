@@ -16,19 +16,21 @@ services:
       dockerfile: dockerfile
     ports:
       - "3000:3000"
-    networks:
-      - app-network
+    depends_on:
+      - backend
 
   auth:
-    build: ./auth
+    build:
+      context: ./auth
+      dockerfile: dockerfile
     ports:
       - "5001:5001"
     networks:
       - app-network
 
 volumes:
-  db_data:
   scripts:
+  logs:
 
 networks:
   app-network:
