@@ -5,10 +5,14 @@ services:
     build:
       context: ./server
       dockerfile: dockerfile
+
     ports:
       - "5000:5000"
     networks:
       - app-network
+    volumes:
+      - ./logs_server:/app/logs
+      - ./scripts_server:/app/scripts
 
   frontend:
     build:
@@ -18,6 +22,10 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+    volumes:
+      - ./logs_web:/app/logs:ro
+      - ./scripts_web:/app/scripts:ro
+
 
   auth:
     build:
