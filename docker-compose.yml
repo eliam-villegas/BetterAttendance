@@ -1,38 +1,38 @@
 version: '3.8'
 
 services:
-  backend:
+
+  server:
+    container_name: main
     build:
       context: ./server
-      dockerfile: dockerfile
-
+      dockerfile: Dockerfile
     ports:
       - "5000:5000"
     networks:
       - app-network
     volumes:
-      - ./logs_server:/app/logs
-      - ./scripts_server:/app/scripts
+      - ./logs:/app/logs
+      - ./scripts:/app/scripts
 
-  frontend:
+  web:
     build:
       context: ./web
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     depends_on:
-      - backend
+      - server
     volumes:
-      - ./logs_web:/app/logs:ro
-      - ./scripts_web:/app/scripts:ro
-
+      - ./logs:/app/logs:ro
+      - ./scripts:/app/scripts:ro
 
   auth:
     build:
       context: ./auth
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
     ports:
-      - "5001:5001"
+      - "5001:5000"
     networks:
       - app-network
 
@@ -42,3 +42,4 @@ volumes:
 
 networks:
   app-network:
+    driver: bridge

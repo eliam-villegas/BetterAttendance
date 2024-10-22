@@ -1,11 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'  # Necesario para que funcione `flash`
+app.secret_key = 'supersecretkey'  # pa que funcione `flash`
 
-# Usuario y contraseña predefinidos
 USERNAME = 'admin'
-PASSWORD = 'password'
+PASSWORD = '1234'
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -14,8 +13,7 @@ def login():
         password = request.form['password']
         
         if username == USERNAME and password == PASSWORD:
-            # Redirige a la webapp utilizando el nombre del servicio 'webapp'
-            return redirect("http://main:5000/dashboard")  # 'webapp' es el nombre del servicio de Docker
+            return redirect("http://main:5000/")  
         else:
             flash("Nombre de usuario o contraseña incorrectos")
     

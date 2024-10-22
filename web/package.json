@@ -1,3 +1,21 @@
 {
- # monaco editor
-}
+    "name": "prueba",
+    "version": "1.0.0",
+    "description": "",
+    "main": "frontend.js",
+    "type": "module",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "start": "react-scripts start",
+      "build": "react-scripts build",
+      "eject": "react-scripts eject"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "express": "^4.21.0",
+      "mongodb": "^6.9.0"
+    }
+  }
+  
