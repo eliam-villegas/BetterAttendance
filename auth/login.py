@@ -6,17 +6,15 @@ app.secret_key = 'supersecretkey'  # pa que funcione `flash`
 USERNAME = 'admin'
 PASSWORD = '1234'
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        
         if username == USERNAME and password == PASSWORD:
-            return redirect("http://main:5000/")  
+            return redirect('http://localhost:5000/home')
         else:
             flash("Nombre de usuario o contraseña incorrectos")
-    
     return render_template('login.html')
 
 if __name__ == '__main__':

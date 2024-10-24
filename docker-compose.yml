@@ -14,6 +14,9 @@ services:
     volumes:
       - ./logs:/app/logs
       - ./scripts:/app/scripts
+    environment:
+      FLASK_ENV: development
+
 
   web:
     build:
@@ -33,8 +36,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5001:5000"
+    depends_on:
+      - server
     networks:
       - app-network
+    environment:
+      FLASK_ENV: development
+
 
 volumes:
   scripts:
