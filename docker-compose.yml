@@ -20,12 +20,14 @@ services:
 
   web:
     build:
-      context: ./web
+      context: ./server/static/js
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
     depends_on:
       - server
+    networks:
+      - app-network
     volumes:
       - ./logs:/app/logs:ro
       - ./scripts:/app/scripts:ro
