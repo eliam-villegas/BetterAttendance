@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for
 from flask_socketio import SocketIO
-from api_handling import handle_message
+from api_handling import ApiHandler
 import os
 
 app = Flask(__name__)
@@ -13,6 +13,7 @@ def login():
 
 @app.route('/home')
 def home():
+    handler = ApiHandler() # Probablemente no vaya aca pero la idea es que se instancie asi
     return render_template('index.html')
 
 if __name__ == '__main__':
