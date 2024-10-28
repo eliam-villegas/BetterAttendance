@@ -27,9 +27,11 @@ body {
 .login-container input {
     width: 100%;
     padding: 10px;
+    padding-right: 15px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    box-sizing: border-box;
 }
 
 .login-container button {
