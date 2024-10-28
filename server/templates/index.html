@@ -3,9 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>backend</title>
+    <title>Página de Selección, Flujo de Trabajo y Editor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/node_modules/monaco-editor/min/vs/editor/editor.main.css">
 </head>
-<body>
-    <h1>Better Atendance</h1>
+<body class="d-flex flex-column justify-content-center align-items-center min-vh-100">
+    <div class="container">
+        <div class="row">
+            <!-- Columna izquierda: Selección de día -->
+            <div class="col-md-6 border-end">
+                <h1 class="mb-4 text-center">Selección de día</h1>
+                <div class="mb-3">
+                    <label for="calendar" class="form-label">Seleccione una fecha:</label>
+                    <input type="date" id="calendar" name="calendar" class="form-control" onchange="updateWorkflowDate()">
+                </div>
+                <div class="mb-3">
+                    <label for="file-upload" class="form-label">Subir archivo acá (.txt):</label>
+                    <input type="file" id="file-upload" class="form-control" accept=".txt" onchange="loadFileContent(event)">
+                </div>
+                <button class="btn btn-primary" onclick="backup()">Copia de seguridad</button>
+            </div>
+
+            <!-- Columna derecha: Interfaz de flujo de trabajo -->
+            <div class="col-md-6">
+                <h1 class="text-center">Flujo de trabajo: día seleccionado</h1>
+                <p id="selected-date" class="text-muted text-center">Seleccione una fecha para mostrar aquí.</p>
+            </div>
+        </div>
+
+        <!-- Contenedor para el editor Monaco -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <h2 class="text-center">Editor de Texto</h2>
+                <div id="editor-container" style="width:100%; height:400px; border:1px solid grey;"></div>
+
+                <!-- Lista desplegable para seleccionar el tema del editor -->
+                <div class="mt-3 text-center">
+                    <label for="theme-select" class="form-label">Seleccionar tema:</label>
+                    <select id="theme-select" class="form-select w-50 mx-auto" onchange="changeEditorTheme(this.value)">
+                        <option value="vs-dark">Oscuro</option>
+                        <option value="vs-light">Claro</option>
+                        <option value="hc-black">Alto contraste</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RequireJS y el script de editorIndex.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+    <script src="/static/js/editorIndex.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

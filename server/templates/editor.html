@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor Monaco</title>
+    <!-- Incluye el CSS de Monaco desde static -->
+    <link rel="stylesheet" href="/node_modules/monaco-editor/dev/vs/editor/editor.main.css">
+</head>
+<body>
+    <!-- Contenedor para el editor -->
+    <div id="container" style="width:800px; height:600px; border:1px solid grey;"></div>
+    
+    <!-- Incluye require.js antes de cargar editor.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+    
+    <!-- Incluye el archivo de configuración del editor -->
+    <script src="/static/js/editor.js"></script>
+</body>
+</html>
