@@ -18,10 +18,10 @@ def calendar():
 
 @app.route('/home')
 def home():
-    ''' Clases
-    handler = ApiHandler() 
-    VCS = Gitlike()
-    '''
+    #Clases
+    #handler = ApiHandler() 
+    #VCS = Gitlike()
+    
     return render_template('editor.html')
 
 # Ruta para servir node_modules
