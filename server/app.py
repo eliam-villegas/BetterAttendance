@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, send_from_directory, url_for
 from flask_socketio import SocketIO
 from api_handling import ApiHandler
+from Gitlike import Gitlike
 import os
 
 app = Flask(__name__)
@@ -17,7 +18,10 @@ def calendar():
 
 @app.route('/home')
 def home():
-    handler = ApiHandler() # Probablemente no vaya aca pero la idea es que se instancie asi
+    ''' Clases
+    handler = ApiHandler() 
+    VCS = Gitlike()
+    '''
     return render_template('editor.html')
 
 # Ruta para servir node_modules
