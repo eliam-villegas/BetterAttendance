@@ -3,14 +3,14 @@ let editor;
 // Configuración y creación del editor de Monaco
 require.config({ paths: { 'vs': '/node_modules/monaco-editor/min/vs' } });
 require(['vs/editor/editor.main'], function() {
-    // Cargar el tema guardado o establecer el tema predeterminado
-    const savedTheme = localStorage.getItem('monacoTheme') || 'vs';
+    // Cargar el tema guardado o establecer el tema claro como predeterminado
+    const savedTheme = localStorage.getItem('monacoTheme') || 'vs-light';
     
-    // Crear el editor con el tema guardado
+    // Crear el editor con el tema guardado o el tema claro
     editor = monaco.editor.create(document.getElementById('editor-container'), {
         value: "// Aquí se mostrará el contenido del archivo .txt cargado\n",
         language: "javascript",
-        theme: savedTheme // Usar el tema guardado
+        theme: savedTheme // Usar el tema guardado o claro por defecto
     });
 
     // Establecer el tema en el menú desplegable según el valor guardado

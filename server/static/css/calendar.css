@@ -1,0 +1,82 @@
+body {
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+}
+.calendar {
+    width: 70%; /* Reduce el ancho total del calendario */
+    padding: 10px; /* Reduce el padding para que ocupe menos espacio */
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 0 auto; /* Centra el calendario */
+    margin-bottom: 8px; /* Añade un margen inferior */
+    margin-top: 8px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px; /* Reduce el margen inferior */
+}
+
+.calendar-header button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 3px 8px; /* Reduce el padding de los botones */
+    border-radius: 4px;
+    font-size: 14px; /* Ajusta el tamaño de la fuente */
+    cursor: pointer;
+}
+
+.days-of-week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 5px; /* Reduce el margen inferior */
+    font-size: 14px; /* Reduce el tamaño de fuente */
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+}
+
+.day {
+    padding: 5px; /* Reduce el padding dentro de cada día */
+    margin: 1px; /* Ajusta el margen para que queden más juntos */
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px; /* Ajusta el tamaño de la fuente */
+}
+
+.day:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.inactive {
+    color: #ddd;
+}
+
+h1 {
+    font-size: 30px; /* Ajusta el tamaño de los títulos principales */
+}
+
+h2 {
+    font-size: 30px; /* Ajusta el tamaño de los subtítulos */
+}
+
+.title-sub {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#month-year {
+    font-size: 18px; /* Ajusta el tamaño de la fuente según tus necesidades */
+    font-weight: bold; /* Mantiene el texto destacado si es necesario */
+    text-align: center; /* Centra el texto en el contenedor */
+}
