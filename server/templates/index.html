@@ -6,6 +6,57 @@
     <title>Página de Selección, Flujo de Trabajo y Editor</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/node_modules/monaco-editor/min/vs/editor/editor.main.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .calendar {
+            width: 100%;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .calendar-header button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .days-of-week {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+        }
+        .day {
+            padding: 8px;
+            margin: 2px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .day:hover {
+            background-color: #007bff;
+            color: white;
+        }
+        .inactive {
+            color: #ddd;
+        }
+    </style>
 </head>
 <body class="d-flex flex-column justify-content-center align-items-center min-vh-100">
     <div class="container">
@@ -13,9 +64,22 @@
             <!-- Columna izquierda: Selección de día -->
             <div class="col-md-6 border-end">
                 <h1 class="mb-4 text-center">Selección de día</h1>
-                <div class="mb-3">
-                    <label for="calendar" class="form-label">Seleccione una fecha:</label>
-                    <input type="date" id="calendar" name="calendar" class="form-control" onchange="updateWorkflowDate()">
+                <div id="interactive-calendar" class="calendar">
+                    <div class="calendar-header">
+                        <button id="prev-month">&lt;</button>
+                        <h2 id="month-year"></h2>
+                        <button id="next-month">&gt;</button>
+                    </div>
+                    <div class="days-of-week">
+                        <div>Dom</div>
+                        <div>Lun</div>
+                        <div>Mar</div>
+                        <div>Mié</div>
+                        <div>Jue</div>
+                        <div>Vie</div>
+                        <div>Sáb</div>
+                    </div>
+                    <div class="calendar-days" id="calendar-days"></div>
                 </div>
                 <div class="mb-3">
                     <label for="file-upload" class="form-label">Subir archivo acá (.txt):</label>
@@ -54,5 +118,60 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
     <script src="/static/js/editorIndex.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+
+        const monthYearDisplay = document.getElementById("month-year");
+        const calendarDays = document.getElementById("calendar-days");
+        const selectedDateDisplay = document.getElementById("selected-date");
+
+        function renderCalendar(month, year) {
+            calendarDays.innerHTML = "";
+            monthYearDisplay.textContent = `${monthNames[month]} ${year}`;
+
+            const firstDay = new Date(year, month).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement("div");
+                emptyDay.classList.add("day", "inactive");
+                calendarDays.appendChild(emptyDay);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement("div");
+                dayElement.classList.add("day");
+                dayElement.textContent = day;
+                dayElement.addEventListener("click", () => {
+                    const selectedDate = new Date(year, month, day);
+                    selectedDateDisplay.textContent = `Día seleccionado: ${selectedDate.toLocaleDateString("es-ES")}`;
+                });
+                calendarDays.appendChild(dayElement);
+            }
+        }
+
+        document.getElementById("prev-month").addEventListener("click", () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar(currentMonth, currentYear);
+        });
+
+        document.getElementById("next-month").addEventListener("click", () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar(currentMonth, currentYear);
+        });
+
+        renderCalendar(currentMonth, currentYear);
+    </script>
 </body>
 </html>
