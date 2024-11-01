@@ -2,10 +2,10 @@ let editor;
 
 // Configuración y creación del editor de Monaco
 require.config({ paths: { 'vs': '/node_modules/monaco-editor/min/vs' } });
-require(['vs/editor/editor.main'], function() {
+require(['vs/editor/editor.main'], function () {
     // Cargar el tema guardado o establecer el tema claro como predeterminado
     const savedTheme = localStorage.getItem('monacoTheme') || 'vs-light';
-    
+
     // Crear el editor con el tema guardado o el tema claro
     editor = monaco.editor.create(document.getElementById('editor-container'), {
         value: "// Aquí se mostrará el contenido del archivo .txt cargado\n",
@@ -35,16 +35,20 @@ function updateWorkflowDate() {
 
 function loadFileContent(event) {
     const file = event.target.files[0];
-    if (file && file.type === "text/plain") {
+    const validExtensions = ['.txt', '.log'];
+
+    // Verificar si el archivo tiene una extensión válida
+    const fileExtension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+    if (file && validExtensions.includes(fileExtension)) {
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             const content = e.target.result;
             // Insertar el contenido en el editor de Monaco
             editor.setValue(content);
         };
         reader.readAsText(file);
     } else {
-        alert("Por favor, seleccione un archivo de texto (.txt).");
+        alert("Por favor, seleccione un archivo de texto (.txt o .log).");
     }
 }
 
