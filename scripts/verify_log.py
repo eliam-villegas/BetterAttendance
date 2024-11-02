@@ -2,6 +2,15 @@ import os
 from datetime import datetime
 
 def verificar_log(log_filename):
+    """
+    Verifica si el archivo log es del dia de hoy.
+
+    Parámetros:
+    - log_filename (str): nombre del archivo log.
+
+    Retorna:
+    - Si el log corresponde al dia o no.
+    """
     # Definir el formato del nombre del archivo de log
     formato = "SIRH-%d-%m-%y_%d-%m-%y"
 
