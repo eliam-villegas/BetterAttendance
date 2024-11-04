@@ -12,11 +12,11 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 def login():
     return redirect('http://localhost:5001/login') # cambiar para produccion
 
-@app.route('/calendario')
+@app.route('/home')
 def calendar():
     return render_template('index.html')
 
-@app.route('/home')
+@app.route('/prueba')
 def home():
     #Clases
     #handler = ApiHandler() 
