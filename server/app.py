@@ -10,13 +10,20 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 
 @app.route('/')
 def login():
-    return redirect('http://localhost:5001/login') # cambiar para produccion
+    #con login:
+    #return redirect('http://localhost:5001/login') 
+
+    #sin login(para pruebas):
+    return redirect('http://localhost:5000/home') 
 
 @app.route('/home')
 def calendar():
     return render_template('index.html')
 
-@app.route('/prueba')
+@app.route('/editor')
+def editor():
+    return render_template('editor.html')
+
 def home():
     #Clases
     #handler = ApiHandler() 

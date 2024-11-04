@@ -1,7 +1,7 @@
 let editor;
 
 // Configuración y creación del editor de Monaco
-require.config({ paths: { 'vs': '/node_modules/monaco-editor/min/vs' } });
+require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.0/min/vs/editor/editor.main.min.js' }});
 require(['vs/editor/editor.main'], function () {
     const savedTheme = localStorage.getItem('monacoTheme') || 'vs-light';
     editor = monaco.editor.create(document.getElementById('editor-container'), {
