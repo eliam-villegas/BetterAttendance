@@ -22,12 +22,13 @@ def calendar():
 
 @app.route('/editor')
 def editor():
+    VCS = Gitlike()
     return render_template('editor.html')
 
 def home():
     #Clases
     #handler = ApiHandler() 
-    #VCS = Gitlike()
+    #
     
     return render_template('editor.html')
 
