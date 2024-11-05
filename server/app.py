@@ -6,7 +6,7 @@ import os
 
 app = Flask(__name__)
 
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app)
 
 @app.route('/')
 def login():
@@ -22,14 +22,15 @@ def calendar():
 
 @app.route('/editor')
 def editor():
-    VCS = Gitlike()
     return render_template('editor.html')
 
+@socketio.on('message')
+def handle_socket_message(message):
+    print("Mensaje recibido en el servidor:", message)
+    handler = ApiHandler()
+    handler.handle_message(message)
+
 def home():
-    #Clases
-    #handler = ApiHandler() 
-    #
-    
     return render_template('editor.html')
 
 # Ruta para servir node_modules
@@ -42,4 +43,4 @@ def page_not_found(e):
     return render_template('404.html'), 404
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    socketio.run(app, host="0.0.0.0", port=5000, debug=True)

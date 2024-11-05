@@ -1,13 +1,21 @@
 import json
 import os
-from flask_socketio import send
+from flask_socketio import SocketIO, send
+from flask import Flask
+import subprocess
+
+app = Flask(__name__)
+socketio = SocketIO(app)
 
 class ApiHandler:
     def __init__(self, logs_dir='logs', scripts_dir='scripts'):
         self.logs_dir = os.path.join(os.path.dirname(__file__), logs_dir)
         self.scripts_dir = os.path.join(os.path.dirname(__file__), scripts_dir)
+        os.makedirs(self.logs_dir, exist_ok=True)
+        os.makedirs(self.scripts_dir, exist_ok=True)
 
     def handle_message(self, message):
+        print("Procesando mensaje:", message)
         try:
             data = json.loads(message)
 
@@ -24,31 +32,38 @@ class ApiHandler:
                 "log_content": log_content,
                 "script_output": script_result
             }
-
-            send(json.dumps(response))
+            socketio.emit('response', json.dumps(response))
 
         except Exception as e:
-            send(json.dumps({"status": "error", "message": str(e)}))
+            socketio.emit('response', json.dumps({"status": "error", "message": str(e)}))
 
+    def read_log_file(self, log_file_path):
+        if not os.path.exists(log_file_path):
+            return f"Log {log_file_path} no encontrado."
 
-    def read_log_file(self, log_filename):
-        if not os.path.exists(log_filename):
-            return f"Log {log_filename} no encontrado."
-
-        with open(log_filename, 'r') as log_file:
+        with open(log_file_path, 'r') as log_file:
             return log_file.read()
 
+def execute_script(self, script_filename, log_file_path):
+    script_file_path = os.path.join(self.scripts_dir, script_filename)
+    print(f"Ejecutando script en: {script_file_path}")
 
-    def execute_script(self, script_filename, log_file_path):
-        script_file_path = os.path.join(self.scripts_dir, script_filename)
+    if not os.path.exists(script_file_path):
+        print(f"Script {script_filename} no encontrado.")
+        return f"Script {script_filename} no encontrado."
 
-        if not os.path.exists(script_file_path):
-            return f"Script {script_filename} no encontrado."
+    try:
+        result = subprocess.run(
+            ["python", script_file_path, log_file_path],
+            capture_output=True,
+            text=True
+        )
+        print("Resultado del script:", result.stdout)
+        if result.returncode != 0:
+            print("Error en ejecución:", result.stderr)
+            return f"Error en ejecución: {result.stderr}"
+        return result.stdout
 
-        try:
-            exec_globals = {}
-            with open(script_file_path, 'r') as script_file:
-                exec(script_file.read(), {"log_file_path": log_file_path, **exec_globals})
-            return exec_globals.get("run")(log_file_path)
-        except Exception as e:
-            return f"Error al ejecutar el script {script_filename}: {str(e)}"
+    except Exception as e:
+        print(f"Error al ejecutar el script {script_filename}: {str(e)}")
+        return f"Error al ejecutar el script {script_filename}: {str(e)}"
