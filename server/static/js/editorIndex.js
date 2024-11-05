@@ -1,4 +1,4 @@
-let editor;
+let editor; // Declaración de editor global
 
 // Configuración y creación del editor de Monaco
 require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.0/min/vs' }});
@@ -6,10 +6,52 @@ require(['vs/editor/editor.main'], function () {
     const savedTheme = localStorage.getItem('monacoTheme') || 'vs-light';
     editor = monaco.editor.create(document.getElementById('editor-container'), {
         value: "// Aquí se mostrará el contenido del archivo cargado\n",
-        language: "javascript",
-        theme: savedTheme
+        language: "plaintext",
+        theme: savedTheme,
+        minimap: { enabled: false }
     });
+
     document.getElementById('theme-select').value = savedTheme;
+
+    // Función para añadir color a cada elemento entre comas
+    function colorizeCSV() {
+        const text = editor.getValue();
+        const lines = text.split('\n');
+        let decorations = [];
+
+        lines.forEach((line, lineIndex) => {
+            const items = line.split(',');
+            let position = 0;
+
+            items.forEach((item, index) => {
+                const startPos = position;
+                const endPos = startPos + item.length;
+                position = endPos + 1; // Añadimos 1 para saltar la coma
+
+                // Asignamos un color diferente a cada fragmento basado en su índice
+                const colorClass = index % 2 === 0 ? 'color-even' : 'color-odd';
+                decorations.push({
+                    range: new monaco.Range(lineIndex + 1, startPos + 1, lineIndex + 1, endPos + 1),
+                    options: {
+                        inlineClassName: colorClass
+                    }
+                });
+            });
+        });
+
+        // Aplicamos los decoradores
+        editor.deltaDecorations([], decorations);
+    }
+
+    // Llamamos a la función de coloreado al cargar el archivo
+    colorizeCSV();
+
+    // Agregamos un evento para re-colorear cuando el texto cambie, con retraso de 500ms
+    let timeoutId;
+    editor.onDidChangeModelContent(() => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(colorizeCSV, 500); // Espera 500ms después de la última edición
+    });
 });
 
 // Función para cambiar el tema del editor y guardar en Local Storage
@@ -25,7 +67,7 @@ let originalContentSegments = []; // Almacenará segmentos originales del archiv
 
 function loadFileContent(event) {
     const file = event.target.files[0];
-    const validExtensions = ['.txt', '.log'];
+    const validExtensions = ['.log'];
 
     const fileExtension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
     if (file && validExtensions.includes(fileExtension)) {

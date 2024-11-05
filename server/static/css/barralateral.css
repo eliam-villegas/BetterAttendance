@@ -1,0 +1,48 @@
+.sidebar {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    background-color: #f8f9fa;
+    overflow-x: hidden;
+    transition: 0.3s;
+    padding-top: 60px;
+    border-left: 1px solid #ddd;
+}
+
+.sidebar a {
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #333;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidebar a:hover {
+    color: #007bff;
+}
+
+/* Botón para abrir y cerrar la barra */
+.toggle-btn {
+    position: fixed;
+    top: 20px; /* Coloca el botón cerca del borde superior */
+    right: 0;
+    font-size: 20px;
+    cursor: pointer;
+    color: #333;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    padding: 5px 10px;
+    border-radius: 5px 0 0 5px;
+    z-index: 1;
+    transition: right 0.3s; /* Transición para que el botón se mueva suavemente */
+}
+
+#editor-container {
+    width: calc(100% - 50px); /* Ajuste para espacio del botón */
+    height: 650px;
+    border: 1px solid grey;
+    transition: margin-right 0.3s; /* Transición suave para el margen */
+}
