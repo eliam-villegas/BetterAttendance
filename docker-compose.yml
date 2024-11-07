@@ -44,6 +44,8 @@ services:
       - app-network
     environment:
       FLASK_ENV: development
+    volumes:
+    ##init.sql
 
 
 volumes:
