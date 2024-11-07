@@ -1,6 +1,6 @@
 import os
 import json
-from git import Repo, GitCommandError
+from git import InvalidGitRepositoryError, Repo, GitCommandError
 
 class Gitlike():
     def __init__(self, repo_path='.', logs_dir='logs'):

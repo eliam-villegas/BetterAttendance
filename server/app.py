@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, send_from_directory, url_for
 from flask_socketio import SocketIO
 from api_handling import ApiHandler
-from Gitlike import Gitlike
+#from Gitlike import Gitlike
 import os
 
 app = Flask(__name__)
