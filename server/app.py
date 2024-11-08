@@ -1,20 +1,22 @@
-from flask import Flask, render_template, redirect, send_from_directory, url_for
+from flask import Flask, render_template, redirect, url_for
 from flask_socketio import SocketIO
 from api_handling import ApiHandler
-#from Gitlike import Gitlike
+from routes.process_log import process_log_bp  # Importa el Blueprint
 import os
 
 app = Flask(__name__)
-
 socketio = SocketIO(app)
+
+UPLOAD_FOLDER = os.path.join(app.root_path, 'uploads')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# Registra el Blueprint
+app.register_blueprint(process_log_bp)
 
 @app.route('/')
 def login():
-    #con login:
-    #return redirect('http://localhost:5001/login') 
-
-    #sin login(para pruebas):
-    return redirect('http://localhost:5000/home') 
+    #return redirect('http://localhost:5001/login')      <-- Para producción
+    return redirect(url_for('calendar'))               # <-- Para desarrollo
 
 @app.route('/home')
 def calendar():
@@ -29,14 +31,6 @@ def handle_socket_message(message):
     print("Mensaje recibido en el servidor:", message)
     handler = ApiHandler()
     handler.handle_message(message)
-
-def home():
-    return render_template('editor.html')
-
-# Ruta para servir node_modules
-@app.route('/node_modules/<path:filename>')
-def node_modules(filename):
-    return send_from_directory(os.path.join(app.root_path, 'node_modules'), filename)
 
 @app.errorhandler(404)
 def page_not_found(e):
