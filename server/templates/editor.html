@@ -18,14 +18,14 @@
                 <label for="file-upload" class="form-label">Subir archivo acá (.log):</label>
                 <input type="file" id="file-upload" class="form-control" accept=".log" onchange="loadFileContent(event)">
             </div>
-            
+
             <!-- Tabla para mostrar el contenido del archivo log -->
             <div class="table-responsive mb-3">
                 <table id="log-table" class="table table-striped table-bordered">
                     <thead>
                         <tr>
                             <th>Tipo de Evento</th>
-                            <th>RUT Encriptado</th>
+                            <th>RUT</th>
                             <th>Hora</th>
                             <th>Fecha</th>
                         </tr>
@@ -43,7 +43,18 @@
         </div>
     </div>
 
+    <!-- Botón para abrir/cerrar la barra lateral -->
+    <div id="toggleButton" class="toggle-btn" onclick="toggleSidebar()">☰</div>
+
+    <!-- Barra lateral derecha -->
+    <div id="mySidebar" class="sidebar">
+        <a href="#" onclick="funcion1()">Eliminar Duplicados</a>
+        <a href="#" onclick="funcion2()">Prueba</a>
+        <a href="#" onclick="funcion3()">Otra Función</a>
+    </div>
+
     <!-- Scripts -->
     <script src="static/js/editor.js"></script> <!-- Script para procesar el log -->
+    <script src="static/js/barralateral.js"></script>
 </body>
 </html>

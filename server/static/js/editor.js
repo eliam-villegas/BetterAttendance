@@ -33,25 +33,51 @@ function loadFileContent(event) {
     reader.readAsText(file);
 }
 
+// Función auxiliar para formatear a dos dígitos (e.g., '6' => '06')
+function formatTwoDigits(value) {
+    return value.toString().padStart(2, '0');
+}
+
 function saveTableContent() {
     const rows = document.querySelectorAll('#log-table tbody tr');
-    const updatedData = [];
+    const logLines = [];
 
+    // Iterar sobre cada fila de la tabla
     rows.forEach(row => {
         const cells = row.querySelectorAll('td');
-        const tipoEvento = cells[0].innerText;
+        
+        // Extraer datos editados de la tabla
+        const tipoEvento = cells[0].innerText === 'Entrada' ? '01' : '03';
         const rutEncriptado = cells[1].innerText;
-        const hora = cells[2].innerText;
-        const fecha = cells[3].innerText;
+        
+        // Obtener y formatear hora y minuto
+        const hora = formatTwoDigits(cells[2].innerText.split(':')[0]);
+        const minuto = formatTwoDigits(cells[2].innerText.split(':')[1]);
+        
+        // Obtener y formatear mes, día y año
+        const fechaParts = cells[3].innerText.split('/');
+        const dia = formatTwoDigits(fechaParts[0]);
+        const mes = formatTwoDigits(fechaParts[1]);
+        const anio = formatTwoDigits(fechaParts[2].slice(-2));  // Solo últimos dos dígitos del año
 
-        updatedData.push({
-            tipoEvento,
-            rutEncriptado,
-            hora,
-            fecha
-        });
+        // Construir la línea en el formato original del archivo .log
+        const logLine = `001,${tipoEvento},01,${rutEncriptado},0000000000,${hora},${minuto},${mes},${dia},${anio},00,00,00,00,00,0000000000,0000000000,    0.00,    0.00`;
+
+        // Agregar la línea a la lista de líneas
+        logLines.push(logLine);
     });
 
-    console.log("Contenido actualizado de la tabla:", updatedData);
-    // Aquí podrías agregar lógica adicional para descargar estos datos o enviarlos a un servidor
+    // Convertir el array de líneas en un contenido de archivo .log
+    const logContent = logLines.join('\n');
+    const blob = new Blob([logContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+
+    // Crear un enlace de descarga para el archivo .log
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'archivo_modificado.log';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
