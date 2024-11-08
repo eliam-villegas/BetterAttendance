@@ -15,8 +15,8 @@ services:
       - ./logs:/app/logs:rw
       - ./scripts:/app/scripts:rw
     privileged: true
-    environment:
-      FLASK_ENV: development
+    env_file:
+      - .env
 
   web:
     build:
@@ -40,17 +40,27 @@ services:
       - "5001:5000"
     depends_on:
       - server
+      - db
     networks:
       - app-network
-    environment:
-      FLASK_ENV: development
+    env_file:
+      - .env
+  
+  db:
+    image: postgres:17.0
+    env_file: 
+      - .env
     volumes:
-    ##init.sql
+      - db_data:/var/lib/postgresql/data
+      - ./auth/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - app-network
 
 
 volumes:
   scripts:
   logs:
+  db_data:
 
 networks:
   app-network:

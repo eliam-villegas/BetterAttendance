@@ -1,3 +1,4 @@
+/* CSS común para login y registro */
 body {
     font-family: Arial, sans-serif;
     background-color: #f7f7f7;
@@ -7,24 +8,26 @@ body {
     height: 100vh;
 }
 
-.login-container {
+.container {
     background-color: white;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
 }
 
-.login-container h2 {
+.container h2 {
     text-align: center;
     margin-bottom: 20px;
 }
 
-.login-container label {
+.container label {
     display: block;
     margin-bottom: 5px;
 }
 
-.login-container input {
+.container input {
     width: 100%;
     padding: 10px;
     padding-right: 15px;
@@ -34,7 +37,7 @@ body {
     box-sizing: border-box;
 }
 
-.login-container button {
+.container button {
     width: 100%;
     padding: 10px;
     background-color: #28a745;
@@ -44,7 +47,7 @@ body {
     cursor: pointer;
 }
 
-.login-container button:hover {
+.container button:hover {
     background-color: #218838;
 }
 
@@ -52,3 +55,46 @@ body {
     color: red;
     margin-top: 10px;
 }
+
+/* Estilos específicos para el enlace de registro en la página de login */
+.login-container p {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.login-container p a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.login-container p a:hover {
+    text-decoration: underline;
+}
+
+/* Estilos para las alertas */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.alert-info {
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+    color: #31708f;
+}
+
+.alert-success {
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+    color: #3c763d;
+}
+
+.alert-danger {
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    color: #a94442;
+}
+

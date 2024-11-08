@@ -7,8 +7,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
-    <div class="login-container">
+    <div class="container">
         <h2>Login</h2>
+        
+        <!-- Nueva sección para invitar al registro -->
+        <p>¿No tienes una cuenta? <a href="{{ url_for('auth.register') }}">Regístrate aquí</a></p>
+        
         <form method="POST" action="{{ url_for('auth.login') }}">
             <label for="username">Nombre de usuario</label>
             <input type="text" id="username" name="username" required>
@@ -16,18 +20,17 @@
             <label for="password">Contraseña</label>
             <input type="password" id="password" name="password" required>
 
-            <button type="submit" value="Login">Iniciar Sesión</button>
+            <button type="submit">Iniciar Sesión</button>
         </form>
 
-        {% with messages = get_flashed_messages() %}
+        <!-- Sección para mostrar mensajes de alerta -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                <div class="error">
-                    <ul>
-                        {% for message in messages %}
-                            <li>{{ message }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
             {% endif %}
         {% endwith %}
     </div>
