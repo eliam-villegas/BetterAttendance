@@ -46,16 +46,6 @@ def buscar_duplicados_en_log(log_filepath):
         return []
 
 def buscar_duplicados_en_lista(data):
-    """
-    Busca tuplas duplicadas en una lista basándose en RUT, tipo de evento y fecha.
-    Devuelve una lista de diccionarios con los resultados, indicando si son duplicados o únicos.
-
-    Parámetros:
-    - data (list): Lista de diccionarios con los datos de log.
-
-    Retorna:
-    - Una lista de diccionarios con cada línea y su estado ("DUPLICADO" o "UNICO").
-    """
     tuplas_vistas = set()  # Almacena las tuplas únicas filtradas
     lineas_procesadas = []  # Almacena todas las líneas con el estado (Duplicado o Único)
 
@@ -72,8 +62,9 @@ def buscar_duplicados_en_lista(data):
         if estado == "UNICO":
             tuplas_vistas.add(clave_unica)
 
-        # Agregar la línea procesada con el estado
+        # Conservar first_value
         lineas_procesadas.append({
+            "first_value": item.get("first_value", ""),  # Conservar el valor original
             "tipo_evento": tipo_evento,
             "rut_encriptado": rut_encriptado,
             "hora": item.get('hora', ''),
@@ -82,3 +73,4 @@ def buscar_duplicados_en_lista(data):
         })
 
     return lineas_procesadas
+

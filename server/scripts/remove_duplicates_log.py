@@ -42,16 +42,6 @@ def eliminar_duplicados_log(log_filepath):
         return []
 
 def eliminar_duplicados_en_lista(data):
-    """
-    Elimina tuplas duplicadas en una lista basándose en RUT, tipo de evento y fecha.
-    Devuelve una lista de diccionarios con las líneas únicas.
-
-    Parámetros:
-    - data (list): Lista de diccionarios con los datos de log.
-
-    Retorna:
-    - Una lista de diccionarios con cada línea única.
-    """
     tuplas_vistas = set()  # Almacena las tuplas únicas filtradas
     lineas_unicas = []     # Almacena las líneas únicas sin duplicados
 
@@ -67,6 +57,7 @@ def eliminar_duplicados_en_lista(data):
         if clave_unica not in tuplas_vistas:
             tuplas_vistas.add(clave_unica)
             lineas_unicas.append({
+                "first_value": item.get("first_value", ""),  # Conservar el valor original
                 "tipo_evento": tipo_evento,
                 "rut_encriptado": rut_encriptado,
                 "hora": item.get('hora', ''),
@@ -74,3 +65,4 @@ def eliminar_duplicados_en_lista(data):
             })
 
     return lineas_unicas
+

@@ -15,9 +15,9 @@ function updateTable(data) {
     const tbody = document.getElementById('log-table').querySelector('tbody');
     tbody.innerHTML = ''; // Limpiar la tabla
 
-    const paginatedData = paginate(data, currentPage);
-    paginatedData.forEach(row => {
+    data.forEach(row => {
         const tr = document.createElement('tr');
+        tr.setAttribute('data-first-value', row.first_value); // Asignar atributo personalizado
 
         // Crear las celdas para los datos
         const tipoEventoTd = document.createElement('td');
@@ -43,9 +43,8 @@ function updateTable(data) {
 
         tbody.appendChild(tr);
     });
-
-    updatePaginationControls(data.length);
 }
+
 
 function updatePaginationControls(totalRows) {
     const totalPages = Math.ceil(totalRows / rowsPerPage);
@@ -100,17 +99,24 @@ function loadFileContent(event) {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         const lines = e.target.result.split('\n');
-        currentData = lines.map(line => {
+        currentData = lines.map((line, index) => {
             const columns = line.split(',');
+
+            // Validar que la línea tenga suficientes columnas
+            if (columns.length < 10) return null;
+
             return {
+                index: index, // Índice original
+                first_value: columns[0], // Primer valor del archivo original
                 tipo_evento: columns[2] === '01' ? 'Entrada' : columns[2] === '03' ? 'Salida' : 'Desconocido',
                 rut_encriptado: columns[3],
                 hora: `${columns[5]}:${columns[6]}`,
                 fecha: `${columns[8]}/${columns[7]}/${columns[9]}`
             };
-        });
+        }).filter(item => item !== null); // Filtrar líneas nulas o incompletas
+
         currentPage = 1; // Reinicia la página actual
         updateTable(currentData); // Mostrar la tabla inicial
     };
@@ -215,41 +221,33 @@ function formatTwoDigits(value) {
 
 // Guardar contenido actualizado, conservando el primer valor de cada fila y respetando el orden de columnas
 function saveTableContent() {
-    const rows = document.querySelectorAll('#log-table tbody tr');
-    const logLines = [];
-
-    rows.forEach((row, index) => {
-        const cells = row.querySelectorAll('td');
-
-        // Recuperar el primer valor de la columna original
-        const firstValue = firstColumnValues[index] || '001';
+    const logLines = currentData.map(row => {
+        // Extraer el valor original desde el objeto en currentData
+        const firstValue = row.first_value;
 
         // Convertir 'Entrada' o 'Salida' al código correspondiente
-        const tipoEvento = cells[0].innerText === 'Entrada' ? '01' : cells[0].innerText === 'Salida' ? '03' : '00';
-        const rutEncriptado = cells[1].innerText;
+        const tipoEvento = row.tipo_evento === 'Entrada' ? '01' : row.tipo_evento === 'Salida' ? '03' : '00';
+        const rutEncriptado = row.rut_encriptado;
 
         // Obtener y formatear hora y minuto
-        const hora = formatTwoDigits(cells[2].innerText.split(':')[0]);
-        const minuto = formatTwoDigits(cells[2].innerText.split(':')[1]);
+        const hora = formatTwoDigits(row.hora.split(':')[0]);
+        const minuto = formatTwoDigits(row.hora.split(':')[1]);
 
         // Obtener y formatear mes, día y año
-        const fechaParts = cells[3].innerText.split('/');
+        const fechaParts = row.fecha.split('/');
         const dia = formatTwoDigits(fechaParts[0]);
         const mes = formatTwoDigits(fechaParts[1]);
-        const anio = formatTwoDigits(fechaParts[2].slice(-2));  // Solo últimos dos dígitos del año
+        const anio = formatTwoDigits(fechaParts[2].slice(-2));
 
-        // Reconstruir la línea de salida usando el primer valor y asegurando el orden correcto de los campos
-        const logLine = `${firstValue},01,${tipoEvento},${rutEncriptado},0000000000,${hora},${minuto},${mes},${dia},${anio},00,00,00,00,00,0000000000,0000000000,    0.00,    0.00`;
-
-        logLines.push(logLine);
+        // Reconstruir la línea de salida
+        return `${firstValue},01,${tipoEvento},${rutEncriptado},0000000000,${hora},${minuto},${mes},${dia},${anio},00,00,00,00,00,0000000000,0000000000,    0.00,    0.00`;
     });
 
-    // Convertir el array de líneas en un contenido de archivo .log
+    // Generar el archivo .log
     const logContent = logLines.join('\n');
     const blob = new Blob([logContent], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
 
-    // Crear un enlace de descarga para el archivo .log
     const a = document.createElement('a');
     a.href = url;
     a.download = 'archivo_modificado.log';
@@ -258,3 +256,4 @@ function saveTableContent() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
+
