@@ -15,7 +15,8 @@ function updateTable(data) {
     const tbody = document.getElementById('log-table').querySelector('tbody');
     tbody.innerHTML = ''; // Limpiar la tabla
 
-    data.forEach(row => {
+    const paginatedData = paginate(data, currentPage); // Obtener datos de la página actual
+    paginatedData.forEach(row => {
         const tr = document.createElement('tr');
         tr.setAttribute('data-first-value', row.first_value); // Asignar atributo personalizado
 
@@ -43,54 +44,125 @@ function updateTable(data) {
 
         tbody.appendChild(tr);
     });
+
+    updatePaginationControls(data.length); // Actualizar los controles de paginación
 }
 
+function showDuplicatesPopup(duplicates) {
+    // Crear una nueva ventana con dimensiones ajustadas
+    const popup = window.open('', 'Duplicados', 'width=1000,height=800,scrollbars=yes,resizable=yes');
+
+    // Crear el contenido HTML para la tabla
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Duplicados</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        </head>
+        <body>
+            <div class="container mt-4">
+                <h2 class="text-center">Duplicados Encontrados</h2>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Tipo de Evento</th>
+                                <th>RUT</th>
+                                <th>Hora</th>
+                                <th>Fecha</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${duplicates.map(row => `
+                                <tr>
+                                    <td>${row.tipo_evento}</td>
+                                    <td>${row.rut_encriptado}</td>
+                                    <td>${row.hora}</td>
+                                    <td>${row.fecha}</td>
+                                </tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center mt-3">
+                    <button class="btn btn-danger" onclick="window.close()">Cerrar</button>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+
+    // Escribir el contenido HTML en la nueva ventana
+    popup.document.open();
+    popup.document.write(htmlContent);
+    popup.document.close();
+}
 
 function updatePaginationControls(totalRows) {
-    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    const totalPages = Math.ceil(totalRows / rowsPerPage); // Calcular número total de páginas
     const paginationControls = document.getElementById('pagination-controls');
-    paginationControls.innerHTML = ''; // Limpia los controles existentes
+    paginationControls.innerHTML = ''; // Limpiar controles existentes
 
-    const maxVisibleButtons = 5; // Máximo número de botones visibles
-    const startPage = Math.max(currentPage - Math.floor(maxVisibleButtons / 2), 1);
-    const endPage = Math.min(startPage + maxVisibleButtons - 1, totalPages);
+    // Crear un contenedor para centrar los controles
+    const controlContainer = document.createElement('div');
+    controlContainer.style.display = 'flex';
+    controlContainer.style.justifyContent = 'center';
+    controlContainer.style.alignItems = 'center';
+    controlContainer.style.gap = '10px'; // Espaciado entre elementos
 
     // Botón "Anterior"
     if (currentPage > 1) {
-        const prevButton = document.createElement('div');
+        const prevButton = document.createElement('button');
         prevButton.textContent = 'Anterior';
-        prevButton.className = 'pagination-button';
+        prevButton.className = 'btn btn-primary';
+        prevButton.style.padding = '5px 10px';
         prevButton.onclick = () => {
             currentPage--;
-            updateTable(currentData);
+            updateTable(currentData); // Actualizar la tabla
         };
-        paginationControls.appendChild(prevButton);
+        controlContainer.appendChild(prevButton);
     }
 
-    // Botones numerados
-    for (let i = startPage; i <= endPage; i++) {
-        const button = document.createElement('div');
-        button.textContent = i;
-        button.className = `pagination-button ${i === currentPage ? 'active' : ''}`;
-        button.onclick = () => {
-            currentPage = i;
-            updateTable(currentData);
-        };
-        paginationControls.appendChild(button);
+    // Combobox para selección directa de páginas
+    const pageSelect = document.createElement('select');
+    pageSelect.style.padding = '5px';
+    pageSelect.style.fontSize = '14px';
+    pageSelect.style.border = '1px solid #ddd';
+    pageSelect.style.borderRadius = '4px';
+    pageSelect.onchange = () => {
+        currentPage = parseInt(pageSelect.value, 10); // Actualizar la página actual
+        updateTable(currentData); // Actualizar la tabla
+    };
+
+    // Agregar opciones al combobox
+    for (let i = 1; i <= totalPages; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `Página ${i}`;
+        if (i === currentPage) option.selected = true; // Seleccionar la página actual
+        pageSelect.appendChild(option);
     }
+
+    controlContainer.appendChild(pageSelect);
 
     // Botón "Siguiente"
     if (currentPage < totalPages) {
-        const nextButton = document.createElement('div');
+        const nextButton = document.createElement('button');
         nextButton.textContent = 'Siguiente';
-        nextButton.className = 'pagination-button';
+        nextButton.className = 'btn btn-primary';
+        nextButton.style.padding = '5px 10px';
         nextButton.onclick = () => {
             currentPage++;
-            updateTable(currentData);
+            updateTable(currentData); // Actualizar la tabla
         };
-        paginationControls.appendChild(nextButton);
+        controlContainer.appendChild(nextButton);
     }
+
+    paginationControls.appendChild(controlContainer);
 }
+
 
 
 // Llama a updateTable después de cargar un archivo
@@ -149,12 +221,16 @@ async function findDuplicates() {
     const result = await response.json();
     if (result.message) {
         showNotification(result.message);
-        currentData = result.resultados; // Actualizar datos globales
-        updateTable(currentData); // Refrescar la tabla y resaltar duplicados
+        currentData = result.resultados; // Actualizar currentData con la respuesta del backend
+        updateTable(currentData); // Refrescar la tabla con los datos actualizados
 
-        // Verificar si hay duplicados
-        const hasDuplicates = currentData.some(row => row.estado === "DUPLICADO");
-        if (!hasDuplicates) {
+        // Filtrar solo los duplicados
+        const duplicates = currentData.filter(row => row.estado === "DUPLICADO");
+
+        // Abrir nueva ventana con los duplicados
+        if (duplicates.length > 0) {
+            showDuplicatesPopup(duplicates); // Mostrar ventana con duplicados
+        } else {
             showNotification('No se encontraron duplicados.');
         }
     }
