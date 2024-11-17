@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
 import os
 from time import time
-from scripts.find_duplicates_log import buscar_duplicados_en_log
-from scripts.remove_duplicates_log import eliminar_duplicados_log
+from scripts.find_duplicates_log import buscar_duplicados_en_lista
+from scripts.remove_duplicates_log import eliminar_duplicados_en_lista
 
 # Crea el Blueprint
 process_log_bp = Blueprint('process_log', __name__)
@@ -24,37 +24,18 @@ def clean_upload_folder():
 
 @process_log_bp.route('/find-duplicates', methods=['POST'])
 def find_duplicates():
-    clean_upload_folder()  # Limpia archivos antes de procesar la solicitud
+    data = request.json.get('data', [])
+    if not data:
+        return jsonify({'message': 'No se recibió ningún dato.'}), 400
 
-    if 'log_file' not in request.files:
-        return jsonify({'message': 'No se subió ningún archivo.'}), 400
-
-    log_file = request.files['log_file']
-    if log_file.filename == '':
-        return jsonify({'message': 'Nombre de archivo vacío.'}), 400
-
-    log_filepath = os.path.join(UPLOAD_FOLDER, log_file.filename)
-    log_file.save(log_filepath)
-
-    resultados = buscar_duplicados_en_log(log_filepath)
-    
+    resultados = buscar_duplicados_en_lista(data)
     return jsonify({'message': 'Duplicados procesados.', 'resultados': resultados})
 
 @process_log_bp.route('/remove-duplicates', methods=['POST'])
 def remove_duplicates():
-    clean_upload_folder()  # Limpia archivos antes de procesar la solicitud
+    data = request.json.get('data', [])
+    if not data:
+        return jsonify({'message': 'No se recibió ningún dato.'}), 400
 
-    if 'log_file' not in request.files:
-        return jsonify({'message': 'No se subió ningún archivo.'}), 400
-
-    log_file = request.files['log_file']
-    if log_file.filename == '':
-        return jsonify({'message': 'Nombre de archivo vacío.'}), 400
-
-    log_filepath = os.path.join(UPLOAD_FOLDER, log_file.filename)
-    log_file.save(log_filepath)
-
-    # Ejecutar el script para eliminar duplicados y obtener solo las filas únicas
-    resultados = eliminar_duplicados_log(log_filepath)
-    
+    resultados = eliminar_duplicados_en_lista(data)
     return jsonify({'message': 'Duplicados eliminados.', 'resultados': resultados})

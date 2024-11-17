@@ -40,3 +40,37 @@ def eliminar_duplicados_log(log_filepath):
     except FileNotFoundError:
         print(f"Archivo '{log_filepath}' no encontrado.")
         return []
+
+def eliminar_duplicados_en_lista(data):
+    """
+    Elimina tuplas duplicadas en una lista basándose en RUT, tipo de evento y fecha.
+    Devuelve una lista de diccionarios con las líneas únicas.
+
+    Parámetros:
+    - data (list): Lista de diccionarios con los datos de log.
+
+    Retorna:
+    - Una lista de diccionarios con cada línea única.
+    """
+    tuplas_vistas = set()  # Almacena las tuplas únicas filtradas
+    lineas_unicas = []     # Almacena las líneas únicas sin duplicados
+
+    for item in data:
+        # Extraer datos relevantes para formar una clave única
+        tipo_evento = item.get('tipo_evento', 'Desconocido')
+        rut_encriptado = item.get('rut_encriptado', '')
+        fecha = item.get('fecha', '')
+
+        clave_unica = (rut_encriptado, tipo_evento, fecha)
+
+        # Si la clave única no ha sido vista, agregarla
+        if clave_unica not in tuplas_vistas:
+            tuplas_vistas.add(clave_unica)
+            lineas_unicas.append({
+                "tipo_evento": tipo_evento,
+                "rut_encriptado": rut_encriptado,
+                "hora": item.get('hora', ''),
+                "fecha": fecha
+            })
+
+    return lineas_unicas
