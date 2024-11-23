@@ -32,18 +32,20 @@ class Gitlike():
         
     def update_metadata(self, file, date):
         metadata_file = os.path.join(self.repo_path, "metadata.json")
-        
+    
         if os.path.exists(metadata_file):
             with open(metadata_file, "r") as f:
-                metadata = json.load(f)
+                try:
+                    metadata = json.load(f)  # Intentamos cargar el JSON existente
+                except json.JSONDecodeError:
+                    metadata = []  # Si hay un error de decodificación, inicializamos como lista vacía
         else:
-            metadata = {}
-
-        metadata[date] = {
-            "file": file,
-            "commit_msg": self.repo.head.commit.message.strip(),
-            "commit_hash": self.repo.head.commit.hexsha
-        }
+            metadata = []
+            
+        metadata.append({
+        "date": date,
+        "file": file
+        })
 
         with open(metadata_file, "w") as f:
             json.dump(metadata, f, indent=4)
@@ -53,3 +55,10 @@ class Gitlike():
         data = self.repo.git.execute(f'git log --pretty=format:"{{\\"commit\\": \\"%H\\", \\"author\\": \\"%an\\", \\"date\\": \\"%ad\\", \\"message\\": \\"%s\\"}}" -- {file}')
         history = json.dumps(data)
         return history
+    
+    def rollback(self, history_hash):
+        # TODO: buscar como retornar el hash del historial para esta funcion
+        try:
+            self.repo.git.execute(f'git reset --soft {history_hash}')
+        except Exception as e:
+            raise RuntimeError(f"Error al devolver el cambio: {e}")

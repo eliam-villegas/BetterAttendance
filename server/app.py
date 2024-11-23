@@ -21,7 +21,6 @@ def login():
 
 @app.route('/home')
 def calendar():
-    Git = Gitlike()
     return render_template('index.html')
 
 @app.route('/editor')
