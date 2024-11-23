@@ -12,8 +12,8 @@ services:
     networks:
       - app-network
     volumes:
-      - ./logs:/app/logs:rw
-      - ./scripts:/app/scripts:rw
+      - ./server/uploads:/app/uploads
+      - ./scripts:/app/scripts
     privileged: true
     env_file:
       - .env
@@ -29,7 +29,7 @@ services:
     networks:
       - app-network
     volumes:
-      - ./logs:/app/logs
+      - ./server/uploads:/app/uploads
       - ./scripts:/app/scripts
 
   auth:
