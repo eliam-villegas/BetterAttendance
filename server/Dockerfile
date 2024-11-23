@@ -4,7 +4,7 @@ RUN apt-get update && \
     apt-get install -y git && \
     apt-get clean
 
-RUN mkdir -p /app && cd /app && git init
+RUN mkdir -p /app && cd /app 
 
 WORKDIR /server
 
@@ -15,4 +15,3 @@ RUN pip install -r requirements.txt
 COPY . .
 
 CMD ["python", "app.py"]
-#CMD ["flask", "run", "--host=0.0.0.0"]

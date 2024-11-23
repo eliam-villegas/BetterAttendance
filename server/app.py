@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for
 from flask_socketio import SocketIO
 from api_handling import ApiHandler
 from routes.process_log import process_log_bp  # Importa el Blueprint
+from Gitlike import Gitlike
 import os
 
 app = Flask(__name__)
@@ -15,11 +16,12 @@ app.register_blueprint(process_log_bp)
 
 @app.route('/')
 def login():
-    #return redirect('http://localhost:5001/login')      <-- Para producción
+    #return redirect('http://localhost:5001/login')      #<-- Para producción
     return redirect(url_for('calendar'))               # <-- Para desarrollo
 
 @app.route('/home')
 def calendar():
+    Git = Gitlike()
     return render_template('index.html')
 
 @app.route('/editor')

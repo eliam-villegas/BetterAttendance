@@ -1,109 +1,55 @@
 import os
 import json
-from git import InvalidGitRepositoryError, Repo, GitCommandError
+from git import Repo
 
 class Gitlike():
-    def __init__(self, repo_path='.', logs_dir='logs'):
-        self.repo_path = os.path.abspath(repo_path)
-        self.logs_dir = os.path.join(os.path.dirname(__file__), logs_dir)
-        os.makedirs(self.logs_dir, exist_ok=True)
+    def __init__(self, path='./uploads'):
+        self.repo_path = path
+        print(f"Inicializando en {self.repo_path}")
+        if not os.path.exists(self.repo_path):
+            raise RuntimeError(f"Volumen no montado o inaccesible")
+        else:
+            print("Volumen encontrado, inicializando repositorio...")
+            self.repo = self._init_repo()
+            print(f"Repositorio inicializado en {self.repo_path}")
 
-        # Comprobar si el repositorio es válido, si no, inicializar uno nuevo
+            
+    def _init_repo(self):
         try:
-            self.repo = Repo(self.repo_path)
-            if self.repo.bare:
-                raise InvalidGitRepositoryError("El repositorio es bare.")
-        except InvalidGitRepositoryError:
-            # Inicializar un nuevo repositorio si no existe
-            self.repo = Repo.init(self.repo_path)
-            print(f"Repositorio Git inicializado en {self.repo_path}")
-
-    def history_log(self, log_name):
+            return Repo.init(self.repo_path)
+        except:
+            return Repo(self.repo_path)
+    
+    def commit(self, file, date, msg='Cambios Guardados'):
+        if not os.path.exists(os.path.join(self.repo_path, file)):
+            raise RuntimeError(f"El archivo {file} no existe en el repositorio.")
         try:
-            log_path = os.path.join(self.logs_dir, f"{log_name}.json")
-            if os.path.exists(log_path):
-                with open(log_path, 'r') as log_file:
-                    return json.load(log_file)
-            else:
-                return "No hay historial disponible."
+            self.repo.git.add(".")
+            self.repo.git.commit(m=msg)
+            self.update_metadata(file, date)
         except Exception as e:
-            return f"Error al cargar el historial: {e}"
+            raise RuntimeError(f"Error al guardar cambios: {e}")
+        
+    def update_metadata(self, file, date):
+        metadata_file = os.path.join(self.repo_path, "metadata.json")
+        
+        if os.path.exists(metadata_file):
+            with open(metadata_file, "r") as f:
+                metadata = json.load(f)
+        else:
+            metadata = {}
 
-    def commit(self, log_name, message='default'):
-        try:
-            self.repo.git.add(A=True)
-            commit = self.repo.index.commit(message)
-            
-            log_path = os.path.join(self.logs_dir, f"{log_name}.json")
-            if os.path.exists(log_path):
-                with open(log_path, 'r') as log_file:
-                    history = json.load(log_file)
-            else:
-                history = []
+        metadata[date] = {
+            "file": file,
+            "commit_msg": self.repo.head.commit.message.strip(),
+            "commit_hash": self.repo.head.commit.hexsha
+        }
 
-            commit_data = {
-                "id": commit.hexsha,
-                "message": commit.message,
-                "author": commit.author.name,
-                "date": commit.committed_datetime.isoformat()
-            }
+        with open(metadata_file, "w") as f:
+            json.dump(metadata, f, indent=4)
 
-            history.append(commit_data)
-            with open(log_path, 'w') as log_file:
-                json.dump(history, log_file, indent=4)
-
-            return f"Commit {commit.hexsha} realizado con mensaje: {message}"
-        except GitCommandError as e:
-            return f"Error en commit: {e}"
-
-    def rollback(self, log_name, commit_id):
-        try:
-            self.repo.git.reset('--hard', commit_id)
-            
-            log_path = os.path.join(self.logs_dir, f"{log_name}.json")
-            if os.path.exists(log_path):
-                with open(log_path, 'r') as log_file:
-                    history = json.load(log_file)
-
-                history = [commit for commit in history if commit['id'] == commit_id]
-                
-                with open(log_path, 'w') as log_file:
-                    json.dump(history, log_file, indent=4)
-                
-                return f"Rollback al commit {commit_id} completado."
-            else:
-                return "No existe historial para hacer rollback."
-        except GitCommandError as e:
-            return f"Error en rollback: {e}"
-
-
-
-    def log(self, limit=10):
-        try:
-            commits = list(self.repo.iter_commits('HEAD', max_count=limit))
-            log_list = []
-            for commit in commits:
-                log_list.append({
-                    "id": commit.hexsha,
-                    "message": commit.message,
-                    "author": commit.author.name,
-                    "date": commit.committed_datetime.isoformat()
-                })
-            return log_list
-        except GitCommandError as e:
-            return f"Error al obtener el log: {e}"
-
-    # Por si acaso se quedan
-    def create_branch(self, branch_name):
-        try:
-            new_branch = self.repo.create_head(branch_name)
-            return f"Rama '{branch_name}' creada exitosamente."
-        except GitCommandError as e:
-            return f"Error al crear rama: {e}"
-
-    def checkout_branch(self, branch_name):
-        try:
-            self.repo.git.checkout(branch_name)
-            return f"Cambio a la rama '{branch_name}' completado."
-        except GitCommandError as e:
-            return f"Error al cambiar de rama: {e}"
+    def get_history(self, file):
+        # me lo dio gepeto, hay que ver como se ve sino cambiarlo
+        data = self.repo.git.execute(f'git log --pretty=format:"{{\\"commit\\": \\"%H\\", \\"author\\": \\"%an\\", \\"date\\": \\"%ad\\", \\"message\\": \\"%s\\"}}" -- {file}')
+        history = json.dumps(data)
+        return history
