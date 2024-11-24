@@ -333,3 +333,101 @@ function saveTableContent() {
     URL.revokeObjectURL(url);
 }
 
+async function checkEntriesWithoutExits() {
+    if (!currentData.length) {
+        showNotification('Por favor, cargue un archivo primero.');
+        return;
+    }
+
+    const response = await fetch('/check-entries-without-exits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: currentData })
+    });
+
+    const result = await response.json();
+    if (result.message) {
+        showNotification(result.message);
+        currentData = result.resultados; // Actualizar datos globales
+        updateTable(currentData); // Refrescar la tabla
+
+        // Mostrar las entradas sin salidas en una ventana emergente
+        const entriesWithoutExits = currentData.filter(row => row.estado === "SIN_SALIDA");
+        if (entriesWithoutExits.length > 0) {
+            showEntriesWithoutExitsPopup(entriesWithoutExits);
+        } else {
+            showNotification('Todas las entradas tienen salidas correspondientes.');
+        }
+    }
+}
+
+function showEntriesWithoutExitsPopup(entries) {
+    const popup = window.open('', 'Entradas sin Salidas', 'width=1000,height=800,scrollbars=yes,resizable=yes');
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Entradas sin Salidas</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        </head>
+        <body>
+            <div class="container mt-4">
+                <h2 class="text-center">Entradas sin Salidas Encontradas</h2>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Tipo de Evento</th>
+                                <th>RUT</th>
+                                <th>Hora</th>
+                                <th>Fecha</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${entries.map(row => `
+                                <tr>
+                                    <td>${row.tipo_evento}</td>
+                                    <td>${row.rut_encriptado}</td>
+                                    <td>${row.hora}</td>
+                                    <td>${row.fecha}</td>
+                                </tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center mt-3">
+                    <button class="btn btn-danger" onclick="window.close()">Cerrar</button>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+
+    popup.document.open();
+    popup.document.write(htmlContent);
+    popup.document.close();
+}
+
+async function correctConsecutiveEvents() {
+    if (!currentData.length) {
+        showNotification('Por favor, cargue un archivo primero.');
+        return;
+    }
+
+    const response = await fetch('/correct-consecutive-events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: currentData })
+    });
+
+    const result = await response.json();
+    if (result.message) {
+        showNotification(result.message);
+        currentData = result.resultados; // Actualizar datos globales con el orden correcto
+
+        // Forzar actualización de la tabla
+        currentPage = 1; // Reiniciar la paginación
+        updateTable(currentData); // Renderizar la tabla con los datos ordenados
+    }
+}

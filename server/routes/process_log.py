@@ -3,6 +3,8 @@ import os
 from time import time
 from scripts.find_duplicates_log import buscar_duplicados_en_lista
 from scripts.remove_duplicates_log import eliminar_duplicados_en_lista
+from scripts.find_entries_without_exit import buscar_entradas_sin_salidas
+from scripts.correct_consecutive_events import corregir_eventos_consecutivos
 
 # Crea el Blueprint
 process_log_bp = Blueprint('process_log', __name__)
@@ -39,3 +41,21 @@ def remove_duplicates():
 
     resultados = eliminar_duplicados_en_lista(data)
     return jsonify({'message': 'Duplicados eliminados.', 'resultados': resultados})
+
+@process_log_bp.route('/check-entries-without-exits', methods=['POST'])
+def check_entries_without_exits():
+    data = request.json.get('data', [])
+    if not data:
+        return jsonify({'message': 'No se recibió ningún dato.'}), 400
+
+    resultados = buscar_entradas_sin_salidas(data)
+    return jsonify({'message': 'Entradas sin salidas procesadas.', 'resultados': resultados})
+
+@process_log_bp.route('/correct-consecutive-events', methods=['POST'])
+def correct_consecutive_events():
+    data = request.json.get('data', [])
+    if not data:
+        return jsonify({'message': 'No se recibió ningún dato.'}), 400
+
+    resultados = corregir_eventos_consecutivos(data)
+    return jsonify({'message': 'Eventos consecutivos corregidos.', 'resultados': resultados})

@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, url_for
 from flask_socketio import SocketIO
 from api_handling import ApiHandler
 from routes.process_log import process_log_bp  # Importa el Blueprint
-from Gitlike import Gitlike
+#from Gitlike import Gitlike
 import os
 
 app = Flask(__name__)
