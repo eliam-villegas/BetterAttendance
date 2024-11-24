@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, flash, redirect, url_for
 import os
 from time import time
 from scripts.find_duplicates_log import buscar_duplicados_en_lista
@@ -9,7 +9,8 @@ from scripts.correct_consecutive_events import corregir_eventos_consecutivos
 # Crea el Blueprint
 process_log_bp = Blueprint('process_log', __name__)
 
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'uploads')
+UPLOAD_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'uploads'))
+
 EXPIRATION_TIME = 60 * 60 * 24  # 1 día en segundos
 
 # Función para limpiar archivos antiguos
@@ -23,6 +24,29 @@ def clean_upload_folder():
             if now - os.path.getmtime(file_path) > EXPIRATION_TIME:
                 os.remove(file_path)
                 print(f"Archivo eliminado: {file_path}")
+
+@process_log_bp.route('/upload_file', methods=['POST'])
+def upload_file():
+    if request.method == 'POST':   
+        if 'file' not in request.files:
+            return jsonify({'message': 'No file part'}), 400
+
+        file = request.files.get('file')
+
+        if not file or file.filename == '':
+            flash('Archivo no seleccionado')
+            return redirect(url_for('calendar'))
+        
+        try:
+            file.save(os.path.join(UPLOAD_FOLDER, file.filename))
+            # TODO: instanciar git y commitear
+            flash('Archivo subido correctamente')
+        except Exception as e:
+            flash(f'Error al guardar el archivo: {e}')
+
+        return redirect(url_for('calendar'))
+
+
 
 @process_log_bp.route('/find-duplicates', methods=['POST'])
 def find_duplicates():

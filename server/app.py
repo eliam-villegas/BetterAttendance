@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, request
 from flask_socketio import SocketIO
 from api_handling import ApiHandler
 from routes.process_log import process_log_bp  # Importa el Blueprint
@@ -8,11 +8,12 @@ import os
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-UPLOAD_FOLDER = os.path.join(app.root_path, 'uploads')
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
 # Registra el Blueprint
 app.register_blueprint(process_log_bp)
+
+# Clave
+app.secret_key = "software2"
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB para el tamano de archivos
 
 @app.route('/')
 def login():
@@ -25,7 +26,16 @@ def calendar():
 
 @app.route('/editor')
 def editor():
-    return render_template('editor.html')
+    file_name = request.args.get('file')  # Obtener el nombre del archivo de la URL
+    if not file_name:
+        return "No se especificó ningún archivo.", 400
+
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], file_name)
+    if not os.path.exists(file_path):
+        return "El archivo no existe.", 404
+
+    return render_template('editor.html', file_name=file_name)
+
 
 @socketio.on('message')
 def handle_socket_message(message):
