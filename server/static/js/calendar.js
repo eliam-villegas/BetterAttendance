@@ -5,6 +5,18 @@ let currentYear = new Date().getFullYear();
 const monthYearDisplay = document.getElementById("month-year");
 const calendarDays = document.getElementById("calendar-days");
 const selectedDateDisplay = document.getElementById("selected-date");
+// Selecciona el elemento de entrada de archivo
+const fileInput = document.getElementById('fileInput');
+const form = document.getElementById('uploadForm');
+
+// Agrega un evento para detectar cuando se selecciona un archivo
+fileInput.addEventListener('change', function () {
+    // Verifica si hay un archivo seleccionado
+    if (fileInput.files.length > 0) {
+        // Envía automáticamente el formulario
+        form.submit();
+    }
+});
 
 function renderCalendar(month, year) {
     calendarDays.innerHTML = "";
@@ -30,6 +42,35 @@ function renderCalendar(month, year) {
         calendarDays.appendChild(dayElement);
     }
 }
+
+function loadFileContent(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        alert("Por favor, seleccione un archivo válido.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    fetch('/upload_file', { // Ruta del servidor para subir el archivo
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Archivo cargado correctamente. Ahora puedes ir al editor.');
+        } else {
+            alert('Error al cargar el archivo: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error al subir el archivo:', error);
+        alert('Ocurrió un error al intentar cargar el archivo.');
+    });
+}
+
 
 document.getElementById("prev-month").addEventListener("click", () => {
     currentMonth--;

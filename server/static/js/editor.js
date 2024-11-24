@@ -163,38 +163,50 @@ function updatePaginationControls(totalRows) {
     paginationControls.appendChild(controlContainer);
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const fileName = document.body.getAttribute('data-file-name');
+    if (!fileName) {
+        alert('No se especificó ningún archivo para cargar.');
+        return;
+    }
 
+    const filePath = `/uploads/${fileName}`; // Ruta al archivo en el servidor
+    renderLogFile(filePath);
+});
 
-// Llama a updateTable después de cargar un archivo
-function loadFileContent(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+function renderLogFile(filepath) {
+    fetch(filepath)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al cargar el archivo: ' + response.statusText);
+            }
+            return response.text();
+        })
+        .then(content => {
+            const lines = content.split('\n');
+            const tbody = document.querySelector('#log-table tbody');
+            tbody.innerHTML = '';
 
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        const lines = e.target.result.split('\n');
-        currentData = lines.map((line, index) => {
-            const columns = line.split(',');
+            lines.forEach(line => {
+                const columns = line.split(',');
+                if (columns.length < 10) return;
 
-            // Validar que la línea tenga suficientes columnas
-            if (columns.length < 10) return null;
-
-            return {
-                index: index, // Índice original
-                first_value: columns[0], // Primer valor del archivo original
-                tipo_evento: columns[2] === '01' ? 'Entrada' : columns[2] === '03' ? 'Salida' : 'Desconocido',
-                rut_encriptado: columns[3],
-                hora: `${columns[5]}:${columns[6]}`,
-                fecha: `${columns[8]}/${columns[7]}/${columns[9]}`
-            };
-        }).filter(item => item !== null); // Filtrar líneas nulas o incompletas
-
-        currentPage = 1; // Reinicia la página actual
-        updateTable(currentData); // Mostrar la tabla inicial
-    };
-
-    reader.readAsText(file);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${columns[2] === '01' ? 'Entrada' : columns[2] === '03' ? 'Salida' : 'Desconocido'}</td>
+                    <td>${columns[3]}</td>
+                    <td>${columns[5]}:${columns[6]}</td>
+                    <td>${columns[8]}/${columns[7]}/${columns[9]}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(error => {
+            console.error('Error al renderizar el archivo:', error);
+            alert('No se pudo cargar el archivo. Verifica que haya sido subido correctamente.');
+        });
 }
+
 
 // Obtener el nombre del archivo cargado y enviarlo al servidor
 function getFilePath() {

@@ -33,14 +33,11 @@ class Gitlike():
     def update_metadata(self, file, date):
         metadata_file = os.path.join(self.repo_path, "metadata.json")
     
-        if os.path.exists(metadata_file):
-            with open(metadata_file, "r") as f:
-                try:
-                    metadata = json.load(f)  # Intentamos cargar el JSON existente
-                except json.JSONDecodeError:
-                    metadata = []  # Si hay un error de decodificación, inicializamos como lista vacía
-        else:
-            metadata = []
+        with open(metadata_file, "r") as f:
+            try:
+                metadata = json.load(f)  # Intentamos cargar el JSON existente
+            except json.JSONDecodeError:
+                metadata = []  # Si hay un error de decodificación, inicializamos como lista vacía
             
         metadata.append({
         "date": date,
