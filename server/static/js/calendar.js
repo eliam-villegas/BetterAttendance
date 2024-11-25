@@ -1,10 +1,12 @@
 const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 let currentMonth = new Date().getMonth();
 let currentYear = new Date().getFullYear();
+const today = new Date(); // Fecha actual
 
 const monthYearDisplay = document.getElementById("month-year");
 const calendarDays = document.getElementById("calendar-days");
 const selectedDateDisplay = document.getElementById("selected-date");
+
 // Selecciona el elemento de entrada de archivo
 const fileInput = document.getElementById('fileInput');
 const form = document.getElementById('uploadForm');
@@ -35,10 +37,27 @@ function renderCalendar(month, year) {
         const dayElement = document.createElement("div");
         dayElement.classList.add("day");
         dayElement.textContent = day;
+
+        // Resaltar el número del día actual
+        if (
+            day === today.getDate() &&
+            month === today.getMonth() &&
+            year === today.getFullYear()
+        ) {
+            dayElement.classList.add("current-day"); // Nueva clase para el día actual
+        }
+
+        // Evento para seleccionar un día
         dayElement.addEventListener("click", () => {
+            // Elimina la clase "selected" de cualquier otro día seleccionado
+            document.querySelectorAll(".day.selected").forEach(el => el.classList.remove("selected"));
+            // Añade la clase "selected" al día clicado
+            dayElement.classList.add("selected");
+
             const selectedDate = new Date(year, month, day);
             selectedDateDisplay.textContent = `Día seleccionado: ${selectedDate.toLocaleDateString("es-ES")}`;
         });
+
         calendarDays.appendChild(dayElement);
     }
 }
@@ -71,7 +90,6 @@ function loadFileContent(event) {
     });
 }
 
-
 document.getElementById("prev-month").addEventListener("click", () => {
     currentMonth--;
     if (currentMonth < 0) {
@@ -90,4 +108,5 @@ document.getElementById("next-month").addEventListener("click", () => {
     renderCalendar(currentMonth, currentYear);
 });
 
+// Renderiza el calendario inicial
 renderCalendar(currentMonth, currentYear);

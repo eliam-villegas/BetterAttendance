@@ -80,3 +80,27 @@ h2 {
     font-weight: bold; /* Mantiene el texto destacado si es necesario */
     text-align: center; /* Centra el texto en el contenedor */
 }
+
+.background-logo {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: -1;
+    opacity: 0.5;
+    width: 350px; /* Ajusta el tamaño según lo necesites */
+    height: auto;
+    pointer-events: none; /* Para evitar interferencias con clics */
+}
+
+.current-day {
+    color: #de4343; /* Cambia el color del texto */
+    font-weight: bold; /* Hace el texto más visible */
+}
+
+/* Día seleccionado: añade un cuadro */
+.day.selected {
+    background-color: #007bff; /* Fondo azul para el día seleccionado */
+    color: white; /* Texto blanco para el contraste */
+    border-radius: 8px; /* Bordes redondeados */
+    padding: 5px; /* Espaciado dentro del cuadro */
+}
