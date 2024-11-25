@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify, flash, redirect, url_for
 import os
 from time import time
+from datetime import date
+from Gitlike import Gitlike
 from scripts.find_duplicates_log import buscar_duplicados_en_lista
 from scripts.remove_duplicates_log import eliminar_duplicados_en_lista
 from scripts.find_entries_without_exit import buscar_entradas_sin_salidas
@@ -10,8 +12,10 @@ from scripts.correct_consecutive_events import corregir_eventos_consecutivos
 process_log_bp = Blueprint('process_log', __name__)
 
 UPLOAD_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'uploads'))
-
 EXPIRATION_TIME = 60 * 60 * 24  # 1 día en segundos
+
+git = Gitlike()
+
 
 # Función para limpiar archivos antiguos
 def clean_upload_folder():
@@ -35,17 +39,16 @@ def upload_file():
 
         if not file or file.filename == '':
             flash('Archivo no seleccionado')
-            return redirect(url_for('calendar'))
         
         try:
             file.save(os.path.join(UPLOAD_FOLDER, file.filename))
-            # TODO: instanciar git y commitear
+            # debe ser la fecha que dice el calendario, no el dia en que se hace
+            git.commit(file,date.today(),'prueba')
             flash('Archivo subido correctamente')
         except Exception as e:
             flash(f'Error al guardar el archivo: {e}')
 
-        return redirect(url_for('calendar'))
-
+        return jsonify({'message': 'Archivo subido'})
 
 
 @process_log_bp.route('/find-duplicates', methods=['POST'])
