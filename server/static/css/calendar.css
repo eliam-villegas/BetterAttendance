@@ -86,8 +86,7 @@ h2 {
     top: 20px;
     left: 20px;
     z-index: -1;
-    opacity: 0.5;
-    width: 350px; /* Ajusta el tamaño según lo necesites */
+    width: 300px; /* Ajusta el tamaño según lo necesites */
     height: auto;
     pointer-events: none; /* Para evitar interferencias con clics */
 }
