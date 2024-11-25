@@ -20,6 +20,8 @@ fileInput.addEventListener('change', function () {
     }
 });
 
+let selectedDate = null; // Variable para guardar la fecha seleccionada
+
 function renderCalendar(month, year) {
     calendarDays.innerHTML = "";
     monthYearDisplay.textContent = `${monthNames[month]} ${year}`;
@@ -38,23 +40,20 @@ function renderCalendar(month, year) {
         dayElement.classList.add("day");
         dayElement.textContent = day;
 
-        // Resaltar el número del día actual
         if (
             day === today.getDate() &&
             month === today.getMonth() &&
             year === today.getFullYear()
         ) {
-            dayElement.classList.add("current-day"); // Nueva clase para el día actual
+            dayElement.classList.add("current-day");
         }
 
         // Evento para seleccionar un día
         dayElement.addEventListener("click", () => {
-            // Elimina la clase "selected" de cualquier otro día seleccionado
             document.querySelectorAll(".day.selected").forEach(el => el.classList.remove("selected"));
-            // Añade la clase "selected" al día clicado
             dayElement.classList.add("selected");
 
-            const selectedDate = new Date(year, month, day);
+            selectedDate = new Date(year, month, day); // Actualiza la fecha seleccionada
             selectedDateDisplay.textContent = `Día seleccionado: ${selectedDate.toLocaleDateString("es-ES")}`;
         });
 
@@ -69,10 +68,16 @@ function loadFileContent(event) {
         return;
     }
 
+    if (!selectedDate) {
+        alert("Por favor, selecciona una fecha en el calendario.");
+        return;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('date', selectedDate.toISOString()); // Añade la fecha seleccionada en formato ISO
 
-    fetch('/upload_file', { // Ruta del servidor para subir el archivo
+    fetch('/upload_file', {
         method: 'POST',
         body: formData
     })

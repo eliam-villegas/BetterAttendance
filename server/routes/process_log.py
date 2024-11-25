@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify, flash, redirect, url_for
 import os
 from time import time
-from datetime import date
-from Gitlike import Gitlike
+#from datetime import date
+from .Gitlike import Gitlike
 from scripts.find_duplicates_log import buscar_duplicados_en_lista
 from scripts.remove_duplicates_log import eliminar_duplicados_en_lista
 from scripts.find_entries_without_exit import buscar_entradas_sin_salidas
@@ -36,6 +36,7 @@ def upload_file():
             return jsonify({'message': 'No file part'}), 400
 
         file = request.files.get('file')
+        date = request.form.get('date')  # Recupera la fecha enviada por el cliente
 
         if not file or file.filename == '':
             flash('Archivo no seleccionado')
@@ -43,12 +44,12 @@ def upload_file():
         try:
             file.save(os.path.join(UPLOAD_FOLDER, file.filename))
             # debe ser la fecha que dice el calendario, no el dia en que se hace
-            git.commit(file,date.today(),'prueba')
+            git.commit(file,date,'prueba')
             flash('Archivo subido correctamente')
         except Exception as e:
             flash(f'Error al guardar el archivo: {e}')
 
-        return jsonify({'message': 'Archivo subido'})
+        return jsonify(git.get_history(file))
 
 
 @process_log_bp.route('/find-duplicates', methods=['POST'])
