@@ -18,7 +18,6 @@ function updateTable(data) {
     const paginatedData = paginate(data, currentPage); // Obtener datos de la página actual
     paginatedData.forEach(row => {
         const tr = document.createElement('tr');
-        tr.setAttribute('data-first-value', row.first_value); // Asignar atributo personalizado
 
         // Crear las celdas para los datos
         const tipoEventoTd = document.createElement('td');
@@ -47,6 +46,7 @@ function updateTable(data) {
 
     updatePaginationControls(data.length); // Actualizar los controles de paginación
 }
+
 
 function showDuplicatesPopup(duplicates) {
     // Crear una nueva ventana con dimensiones ajustadas
@@ -117,44 +117,20 @@ function updatePaginationControls(totalRows) {
         const prevButton = document.createElement('button');
         prevButton.textContent = 'Anterior';
         prevButton.className = 'btn btn-primary';
-        prevButton.style.padding = '5px 10px';
         prevButton.onclick = () => {
-            currentPage--;
+            currentPage--; // Retrocede una página
             updateTable(currentData); // Actualizar la tabla
         };
         controlContainer.appendChild(prevButton);
     }
-
-    // Combobox para selección directa de páginas
-    const pageSelect = document.createElement('select');
-    pageSelect.style.padding = '5px';
-    pageSelect.style.fontSize = '14px';
-    pageSelect.style.border = '1px solid #ddd';
-    pageSelect.style.borderRadius = '4px';
-    pageSelect.onchange = () => {
-        currentPage = parseInt(pageSelect.value, 10); // Actualizar la página actual
-        updateTable(currentData); // Actualizar la tabla
-    };
-
-    // Agregar opciones al combobox
-    for (let i = 1; i <= totalPages; i++) {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = `Página ${i}`;
-        if (i === currentPage) option.selected = true; // Seleccionar la página actual
-        pageSelect.appendChild(option);
-    }
-
-    controlContainer.appendChild(pageSelect);
 
     // Botón "Siguiente"
     if (currentPage < totalPages) {
         const nextButton = document.createElement('button');
         nextButton.textContent = 'Siguiente';
         nextButton.className = 'btn btn-primary';
-        nextButton.style.padding = '5px 10px';
         nextButton.onclick = () => {
-            currentPage++;
+            currentPage++; // Avanza una página
             updateTable(currentData); // Actualizar la tabla
         };
         controlContainer.appendChild(nextButton);
@@ -185,28 +161,27 @@ function renderLogFile(filepath) {
         })
         .then(content => {
             const lines = content.split('\n');
-            const tbody = document.querySelector('#log-table tbody');
-            tbody.innerHTML = '';
-
-            lines.forEach(line => {
+            currentData = lines.map(line => {
                 const columns = line.split(',');
-                if (columns.length < 10) return;
+                if (columns.length < 10) return null;
 
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${columns[2] === '01' ? 'Entrada' : columns[2] === '03' ? 'Salida' : 'Desconocido'}</td>
-                    <td>${columns[3]}</td>
-                    <td>${columns[5]}:${columns[6]}</td>
-                    <td>${columns[8]}/${columns[7]}/${columns[9]}</td>
-                `;
-                tbody.appendChild(row);
-            });
+                return {
+                    tipo_evento: columns[2] === '01' ? 'Entrada' : columns[2] === '03' ? 'Salida' : 'Desconocido',
+                    rut_encriptado: columns[3],
+                    hora: `${columns[5]}:${columns[6]}`,
+                    fecha: `${columns[8]}/${columns[7]}/${columns[9]}`
+                };
+            }).filter(row => row !== null);
+
+            currentPage = 1; // Reiniciar la paginación
+            updateTable(currentData); // Actualizar tabla con datos paginados
         })
         .catch(error => {
             console.error('Error al renderizar el archivo:', error);
             alert('No se pudo cargar el archivo. Verifica que haya sido subido correctamente.');
         });
 }
+
 
 
 // Obtener el nombre del archivo cargado y enviarlo al servidor
