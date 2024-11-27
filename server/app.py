@@ -15,6 +15,7 @@ app.register_blueprint(process_log_bp)
 app.secret_key = "software2"
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB para el tamano de archivos
 UPLOADS_PATH = os.path.join(os.path.dirname(__file__), 'uploads')
+app.config['UPLOADS_PATH'] = UPLOADS_PATH
 
 @app.route('/')
 def login():

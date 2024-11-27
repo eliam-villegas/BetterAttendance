@@ -164,15 +164,16 @@ function updatePaginationControls(totalRows) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const fileName = document.body.getAttribute('data-file-name');
+    const fileName = document.body.getAttribute('data-file'); // Obtiene el archivo del atributo data-file
     if (!fileName) {
         alert('No se especificó ningún archivo para cargar.');
         return;
     }
 
     const filePath = `/uploads/${fileName}`; // Ruta al archivo en el servidor
-    renderLogFile(filePath);
+    renderLogFile(filePath); // Llama a la función para renderizar el archivo
 });
+
 
 function renderLogFile(filepath) {
     fetch(filepath)

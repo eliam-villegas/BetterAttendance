@@ -69,10 +69,16 @@ function renderCalendar(month, year) {
 
             // Mostrar el archivo asociado si existe
             const fileName = dayElement.getAttribute("data-file");
+            const editorButton = document.querySelector(".btn-primary");
+
             if (fileName) {
                 fileNameDisplay.textContent = `Archivo: ${fileName}`;
+                editorButton.href = `/editor?file=${encodeURIComponent(fileName)}`; // Actualiza el enlace dinámicamente
+                editorButton.classList.remove("disabled"); // Habilita el botón
             } else {
                 fileNameDisplay.textContent = "Archivo: Ninguno";
+                editorButton.href = "#"; // Desactiva el enlace
+                editorButton.classList.add("disabled"); // Deshabilita el botón
             }
         });
 
