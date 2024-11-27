@@ -103,3 +103,19 @@ h2 {
     border-radius: 8px; /* Bordes redondeados */
     padding: 5px; /* Espaciado dentro del cuadro */
 }
+
+#dropzone {
+    max-width: 400px; /* Tamaño máximo del contenedor */
+    width: 100%; /* Adaptable al contenedor padre */
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+#dropzone.dragging {
+    background-color: #e9ecef;
+    border-color: #007bff;
+}
+
+#file-selected {
+    text-align: center; /* Asegurar que el texto esté centrado */
+}
