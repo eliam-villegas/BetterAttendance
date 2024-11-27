@@ -39,19 +39,17 @@
             <div class="col-md-6">
                 <h1 class="display-10 text-center">Flujo de trabajo: día seleccionado</h1>
                 <p id="selected-date" class="text-muted text-center">Seleccione una fecha para mostrar aquí.</p>
-                
-                <!-- Campo para cargar archivo
-                <div class="mb-3 text-center">
-                    <label for="file-upload" class="form-label">Subir archivo acá (.log):</label>
-                    <input type="file" id="file-upload" class="form-control w-75 mx-auto" accept=".log" onchange="loadFileContent(event)">
-                </div> -->
-                <div>
+            
+                <!-- Aquí mostramos el nombre del archivo -->
+                <p id="file-name-display" class="text-muted text-center">Archivo: Ninguno</p>
+            
+                <div class="col-md-6">
                     <form id="uploadForm" action="/upload_file" method="post" enctype="multipart/form-data">
                         <input type="file" name="file" id="fileInput" />
                     </form>
                 </div>
-
-                <!-- Agregar el botón aquí -->
+            
+                <!-- Botón para ir al editor -->
                 <div class="text-center mt-4">
                     <a href="{{ url_for('editor') }}" class="btn btn-primary">Ir al Editor de Texto</a>
                 </div>

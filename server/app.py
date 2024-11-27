@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request,send_from_directory
 from flask_socketio import SocketIO
 from api_handling import ApiHandler
 from routes.process_log import process_log_bp  # Importa el Blueprint
@@ -14,6 +14,7 @@ app.register_blueprint(process_log_bp)
 # Clave
 app.secret_key = "software2"
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB para el tamano de archivos
+UPLOADS_PATH = os.path.join(os.path.dirname(__file__), 'uploads')
 
 @app.route('/')
 def login():
@@ -30,7 +31,7 @@ def editor():
     if not file_name:
         return "No se especificó ningún archivo.", 400
 
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], file_name)
+    file_path = os.path.join(app.config['UPLOADS_PATH'], file_name)
     if not os.path.exists(file_path):
         return "El archivo no existe.", 404
 
@@ -46,6 +47,10 @@ def handle_socket_message(message):
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+@app.route('/uploads/<path:filename>')
+def uploaded_file(filename):
+    return send_from_directory(UPLOADS_PATH, filename)
 
 if __name__ == '__main__':
     socketio.run(app, host="0.0.0.0", port=5000, debug=True)

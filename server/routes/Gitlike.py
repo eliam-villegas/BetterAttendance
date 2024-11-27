@@ -28,30 +28,12 @@ class Gitlike():
         try:
             self.repo.index.add(file)
             print(f'files added')
-            self.repo.index.commit(m=msg)
+            self.repo.index.commit('-m',msg)
             print(f'files commited')
-            self.update_metadata(file, date)
         except Exception as e:
             raise RuntimeError(f"Error al guardar cambios: {e}")
         
-    def update_metadata(self, file, date):
-        metadata_file = os.path.join(self.repo_path, "metadata.json")
-    
-        with open(metadata_file, "r") as f:
-            try:
-                metadata = json.load(f)  # Intentamos cargar el JSON existente
-            except json.JSONDecodeError:
-                metadata = []  # Si hay un error de decodificación, inicializamos como lista vacía
-            
-        metadata.append({
-        "date": date,
-        "file": file
-        })
-
-        with open(metadata_file, "w") as f:
-            json.dump(metadata, f, indent=4)
         
-
     def get_history(self, file):
         data = self.repo.git.log('-p','--',file)
         #data = self.repo.iter_commits()
