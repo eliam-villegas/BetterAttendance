@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, redirect, url_for
 import os
 import json
 from time import time
@@ -34,7 +34,7 @@ def upload_file():
         if 'file' not in request.files:
             return jsonify({'message': 'No se recibió ningún archivo.'}), 400
 
-        date = request.form.get('date')
+        date = request.form.get('date', '3/11/2024')
         file = request.files.get('file')
 
         if not date:
@@ -46,7 +46,8 @@ def upload_file():
         try:
             file.save(os.path.join(UPLOAD_FOLDER, file.filename))
             update_metadata(file.filename, date)
-            return jsonify({'message': 'Archivo subido correctamente.'}), 200
+            return redirect(url_for('calendar'))  
+            #return render_template('index.html')
         except Exception as e:
             print(f"Error: {str(e)}")
             return jsonify({'message': 'Error al guardar el archivo o actualizar los metadatos.'}), 500
