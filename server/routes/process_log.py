@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, flash, redirect, url_for
+from flask import Blueprint, request, jsonify, render_template
 import os
 import json
 from time import time
@@ -16,7 +16,6 @@ EXPIRATION_TIME = 60 * 60 * 24  # 1 día en segundos
 
 git = Gitlike()
 
-
 # Función para limpiar archivos antiguos
 def clean_upload_folder():
     """Elimina archivos antiguos en la carpeta uploads."""
@@ -29,44 +28,51 @@ def clean_upload_folder():
                 os.remove(file_path)
                 print(f"Archivo eliminado: {file_path}")
 
-@process_log_bp.route('/upload_file', methods=['POST'])
+@process_log_bp.route('/upload_file', methods=['GET','POST'])
 def upload_file():
-    if request.method == 'POST':   
+    if request.method == 'POST':
         if 'file' not in request.files:
-            return jsonify({'message': 'No file part'}), 400
+            return jsonify({'message': 'No se recibió ningún archivo.'}), 400
 
+        date = request.form.get('date')
         file = request.files.get('file')
-        date = request.form.get('date')  
+
+        if not date:
+            return jsonify({'message': 'No se recibió ninguna fecha.'}), 400
 
         if not file or file.filename == '':
-            flash('Archivo no seleccionado')
+            return jsonify({'message': 'No se recibió ningún archivo.'}), 400
         
         try:
             file.save(os.path.join(UPLOAD_FOLDER, file.filename))
-            git.commit(file,date,'prueba')
-            flash('Archivo subido correctamente')
-            update_metadata(file, date)
+            update_metadata(file.filename, date)
+            return jsonify({'message': 'Archivo subido correctamente.'}), 200
         except Exception as e:
-            flash(f'Error al guardar el archivo: {e}')
+            print(f"Error: {str(e)}")
+            return jsonify({'message': 'Error al guardar el archivo o actualizar los metadatos.'}), 500
 
-        return jsonify(git.get_history(file))
+
 
 def update_metadata(file, date):
     metadata_file = os.path.join(UPLOAD_FOLDER, "metadata.json")
     
-    with open(metadata_file, "r") as f:
-        try:
-            metadata = json.load(f)  
-        except json.JSONDecodeError:
-            metadata = []  
-            
-    metadata.append({ "date": date, "file": file })
-
-    with open(metadata_file, "w") as f:
-        json.dump(metadata, f, indent=4)
-
-def read_metadata():
-    print(peo)
+    # Lee el archivo de metadata si existe, si no, crea una lista vacía
+    if os.path.exists(metadata_file):
+        with open(metadata_file, 'r') as fp:
+            listObj = json.load(fp)
+    else:
+        listObj = []
+    
+    # Añade un nuevo objeto con la fecha y archivo
+    listObj.append({
+        "date": date,
+        "file": file 
+    })
+    
+    # Escribe la lista actualizada en el archivo JSON
+    with open(metadata_file, 'w') as json_file:
+        json.dump(listObj, json_file, indent=4, separators=(',', ': '))
+ 
 
 @process_log_bp.route('/find-duplicates', methods=['POST'])
 def find_duplicates():
