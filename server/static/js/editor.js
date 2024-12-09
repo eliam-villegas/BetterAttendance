@@ -224,25 +224,29 @@ async function findDuplicates() {
     }
 }
 
-function populateTable(data) {
+function updateTable(data) {
+    // Ordenar los datos por fecha y hora
+    data.sort((a, b) => {
+        const fechaA = a.fecha.split('/').reverse().join('');
+        const fechaB = b.fecha.split('/').reverse().join('');
+        return fechaA.localeCompare(fechaB) || a.hora.localeCompare(b.hora);
+    });
+
     const tbody = document.getElementById('log-table').querySelector('tbody');
-    tbody.innerHTML = ''; // Limpiar la tabla antes de añadir nuevas filas
+    tbody.innerHTML = ''; // Limpiar la tabla
 
-    data.forEach(row => {
+    const paginatedData = paginate(data, currentPage); // Obtener datos paginados
+    paginatedData.forEach(row => {
         const tr = document.createElement('tr');
+        tr.setAttribute('data-first-value', row.first_value || ''); // Asignar atributo personalizado
 
-        // Crear las celdas para los datos
+        // Crear celdas
         const tipoEventoTd = document.createElement('td');
         tipoEventoTd.textContent = row.tipo_evento;
         tr.appendChild(tipoEventoTd);
 
         const rutTd = document.createElement('td');
         rutTd.textContent = row.rut_encriptado;
-
-        // Resaltar en amarillo si es duplicado
-        if (row.estado === "DUPLICADO") {
-            rutTd.style.backgroundColor = 'yellow';
-        }
         tr.appendChild(rutTd);
 
         const horaTd = document.createElement('td');
@@ -255,8 +259,9 @@ function populateTable(data) {
 
         tbody.appendChild(tr);
     });
-}
 
+    updatePaginationControls(data.length); // Actualizar controles de paginación
+}
 // Modificar removeDuplicates para trabajar con el archivo completo
 async function removeDuplicates() {
     if (!currentData.length) {
@@ -412,10 +417,38 @@ async function correctConsecutiveEvents() {
     const result = await response.json();
     if (result.message) {
         showNotification(result.message);
-        currentData = result.resultados; // Actualizar datos globales con el orden correcto
-
-        // Forzar actualización de la tabla
-        currentPage = 1; // Reiniciar la paginación
-        updateTable(currentData); // Renderizar la tabla con los datos ordenados
+        currentData = result.resultados; // Actualizar datos globales
+        updateTable(currentData); // Refrescar la tabla con los datos corregidos (si aplica)
     }
 }
+
+async function insertMissingExits() {
+    if (!currentData.length) {
+        showNotification('Por favor, cargue un archivo primero.');
+        return;
+    }
+
+    try {
+        const response = await fetch('/insert-missing-exits', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data: currentData })
+        });
+
+        const result = await response.json();
+        console.log('Datos recibidos del backend:', result.resultados); // DEBUG
+
+        if (response.ok) {
+            showNotification(result.message);
+            currentData = result.resultados; // Actualiza los datos
+            currentPage = 1;
+            updateTable(currentData); // Actualiza la tabla
+        } else {
+            showNotification('Error al procesar los datos: ' + result.message);
+        }
+    } catch (error) {
+        console.error('Error al insertar salidas faltantes:', error);
+        showNotification('Ocurrió un error al procesar los datos.');
+    }
+}
+

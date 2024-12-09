@@ -7,6 +7,7 @@ from scripts.find_duplicates_log import buscar_duplicados_en_lista
 from scripts.remove_duplicates_log import eliminar_duplicados_en_lista
 from scripts.find_entries_without_exit import buscar_entradas_sin_salidas
 from scripts.correct_consecutive_events import corregir_eventos_consecutivos
+from scripts.insert_missing_exits import insertar_salidas_faltantes
 
 # Crea el Blueprint
 process_log_bp = Blueprint('process_log', __name__)
@@ -108,5 +109,9 @@ def correct_consecutive_events():
     if not data:
         return jsonify({'message': 'No se recibió ningún dato.'}), 400
 
-    resultados = corregir_eventos_consecutivos(data)
+    resultados, tiene_consecutivos = corregir_eventos_consecutivos(data)
+
+    if not tiene_consecutivos:
+        return jsonify({'message': 'No se encontraron eventos consecutivos.', 'resultados': resultados})
+
     return jsonify({'message': 'Eventos consecutivos corregidos.', 'resultados': resultados})

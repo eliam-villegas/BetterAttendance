@@ -7,6 +7,7 @@ def corregir_eventos_consecutivos(data):
     """
     eventos_por_rut = {}  # Agrupa eventos por RUT y fecha
     lineas_procesadas = []
+    tiene_consecutivos = False  # Indicador para saber si hay eventos consecutivos
 
     # Agrupar eventos por RUT y fecha
     for item in data:
@@ -35,10 +36,12 @@ def corregir_eventos_consecutivos(data):
             # Si hay dos entradas consecutivas, corregir la última a salida
             if evento_anterior['tipo_evento'] == 'Entrada' and evento_actual['tipo_evento'] == 'Entrada':
                 evento_actual['tipo_evento'] = 'Salida'
+                tiene_consecutivos = True
 
             # Si hay dos salidas consecutivas, corregir la última a entrada
             if evento_anterior['tipo_evento'] == 'Salida' and evento_actual['tipo_evento'] == 'Salida':
                 evento_actual['tipo_evento'] = 'Entrada'
+                tiene_consecutivos = True
 
         lineas_procesadas.extend(eventos)
 
@@ -49,4 +52,4 @@ def corregir_eventos_consecutivos(data):
         0 if x.get('tipo_evento') == 'Entrada' else 1  # Entradas antes que salidas
     ))
 
-    return lineas_procesadas
+    return lineas_procesadas, tiene_consecutivos
