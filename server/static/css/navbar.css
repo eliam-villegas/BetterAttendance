@@ -1,0 +1,84 @@
+/* Asegurarse de que el contenido principal no esté pegado a la barra de navegación */
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Asegura que el contenido ocupe toda la altura */
+}
+
+header {
+    background-color: var(--azul); /* Fondo de la barra con color principal */
+    margin-bottom: 0;
+}
+
+/* Espaciado debajo del navbar */
+.main-container, .container {
+    margin-top: 80px; /* Espaciado entre la barra de navegación y el contenido */
+    padding: 20px; /* Relleno interno para evitar que el contenido toque los bordes */
+}
+
+/* Espaciado del footer */
+footer {
+    background-color: #333;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    margin-top: auto; /* Empuja el footer hacia abajo */
+}
+
+/* Estilo adicional para los contenedores principales */
+.container {
+    background-color: #ffffff; /* Fondo blanco para el contenido principal */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Sombra ligera para dar profundidad */
+    border-radius: 8px; /* Bordes redondeados */
+}
+
+/* Espaciado interno en las columnas */
+.col-md-6 {
+    padding: 20px; /* Espaciado interno en cada columna */
+}
+
+/* Títulos centrados y con separación */
+h1 {
+    margin-bottom: 20px; /* Espaciado inferior entre el título y el contenido */
+    text-align: center; /* Centrar los títulos */
+}
+
+#dropzone {
+    padding: 20px; /* Añadir relleno al área de arrastrar y soltar */
+    border: 2px dashed var(--azul); /* Borde más visible */
+    border-radius: 8px; /* Bordes redondeados */
+}
+
+/* Asegurar que el calendario tenga separación */
+.calendar {
+    margin: 0 auto;
+    padding: 20px;
+    max-width: 90%; /* Ajustar el tamaño máximo */
+}
+
+/* Aumentar el tamaño del logo */
+.navbar-brand img {
+    height: 80px; /* Ajusta el tamaño del logo */
+    width: auto; /* Mantén la proporción del logo */
+}
+
+/* Aumentar el tamaño de la barra de navegación */
+header .navbar {
+    padding: 20px 0; /* Incrementa el espacio vertical */
+    min-height: 80px; /* Ajusta la altura mínima de la barra */
+}
+
+/* Alinear verticalmente el contenido dentro de la barra */
+.navbar .navbar-nav .nav-link {
+    line-height: 60px; /* Asegura que el texto esté centrado con el logo */
+}
+
+/* Opcional: Ajustar el tamaño del texto en la barra */
+.navbar .nav-link {
+    font-size: 18px; /* Incrementa el tamaño del texto */
+}

@@ -2,6 +2,7 @@ body {
     font-family: Arial, sans-serif;
     font-size: 16px;
 }
+
 .calendar {
     width: 70%; /* Reduce el ancho total del calendario */
     padding: 10px; /* Reduce el padding para que ocupe menos espacio */

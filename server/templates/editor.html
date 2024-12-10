@@ -1,68 +1,60 @@
-<!DOCTYPE html>
-<html lang="es">
+{% extends "navbar.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualización de Archivo Log</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/barralateral.css">
-    <link rel="stylesheet" href="/static/css/notificacion.css">
-    <link rel="stylesheet" href="/static/css/pagination.css">
-</head>
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/barralateral.css">
+<link rel="stylesheet" href="/static/css/notificacion.css">
+<link rel="stylesheet" href="/static/css/pagination.css">
+{% endblock %}
 
-<!-- Agregado data-file con la referencia dinámica -->
-<body class="d-flex flex-column justify-content-center align-items-center min-vh-100" data-file="{{ file_name }}">
-    <div class="container">
-        <div class="md-6">
-            <div class="col text-start">
-                <h2 class="title-sub">Visualización de Archivo Log</h2>
-            </div>
+{% block content %}
+<div class="container d-flex flex-column justify-content-center align-items-center min-vh-100" data-file="{{ file_name }}">
+    <div class="md-6">
+        <div class="col text-start">
+            <h2 class="title-sub">Visualización de Archivo Log</h2>
+        </div>
 
-            <!-- Tabla para mostrar el contenido del archivo log -->
-            <div class="table-responsive mb-3" style="max-height: 800px; overflow-y: auto;">
-                <table id="log-table" class="table table-striped table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Tipo de Evento</th>
-                            <th>RUT</th>
-                            <th>Hora</th>
-                            <th>Fecha</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Filas de datos generadas dinámicamente aquí -->
-                    </tbody>
-                </table>
-            </div>
+        <!-- Tabla para mostrar el contenido del archivo log -->
+        <div class="table-responsive mb-3" style="max-height: 800px; overflow-y: auto;">
+            <table id="log-table" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Tipo de Evento</th>
+                        <th>RUT</th>
+                        <th>Hora</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Filas de datos generadas dinámicamente -->
+                </tbody>
+            </table>
+        </div>
 
-            <div class="pagination-container" id="pagination-controls"></div>
+        <div class="pagination-container" id="pagination-controls"></div>
 
-            <!-- Botón para guardar cambios en la tabla -->
-            <div class="text-end">
-                <button class="btn btn-success" onclick="saveTableContent()">Guardar Cambios</button>
-            </div>
+        <!-- Botón para guardar cambios en la tabla -->
+        <div class="text-end">
+            <button class="btn btn-success" onclick="saveTableContent()">Guardar Cambios</button>
         </div>
     </div>
+</div>
 
-    <!-- Botón para abrir/cerrar la barra lateral -->
-    <div id="toggleButton" class="toggle-btn" onclick="toggleSidebar()">☰</div>
+<!-- Botón para abrir/cerrar la barra lateral -->
+<div id="toggleButton" class="toggle-btn" onclick="toggleSidebar()">☰</div>
 
-    <!-- Barra lateral derecha -->
-    <div id="mySidebar" class="sidebar">
-        <a href="#" onclick="findDuplicates()">Buscar Duplicados</a>
-        <a href="#" onclick="removeDuplicates()">Eliminar Duplicados</a>
-        <a href="#" onclick="correctConsecutiveEvents()">Corregir Eventos Consecutivos</a>
-        <a href="#" onclick="checkEntriesWithoutExits()">Verificar Entradas sin Salidas</a>
-        <a href="#" onclick="insertMissingExits()">Agregar Salidas Faltantes</a>
-    </div>
+<!-- Barra lateral derecha -->
+<div id="mySidebar" class="sidebar">
+    <a href="#" onclick="findDuplicates()">Buscar Duplicados</a>
+    <a href="#" onclick="removeDuplicates()">Eliminar Duplicados</a>
+    <a href="#" onclick="correctConsecutiveEvents()">Corregir Eventos Consecutivos</a>
+    <a href="#" onclick="checkEntriesWithoutExits()">Verificar Entradas sin Salidas</a>
+    <a href="#" onclick="insertMissingExits()">Agregar Salidas Faltantes</a>
+</div>
 
-    <div id="notification" class="notification"></div>
+<div id="notification" class="notification"></div>
 
-    <!-- Scripts -->
+<!-- Scripts -->
     <script src="static/js/editor.js"></script> <!-- Script para procesar el log -->
     <script src="static/js/barralateral.js"></script>
     <script src="static/js/notificacion.js"></script>
-</body>
-
-</html>
+{% endblock %}

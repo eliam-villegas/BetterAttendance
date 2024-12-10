@@ -140,7 +140,9 @@ function updatePaginationControls(totalRows) {
 
 // Función para renderizar el archivo .log
 document.addEventListener('DOMContentLoaded', () => {
-    const fileName = document.body.getAttribute('data-file');
+    const container = document.querySelector('.container[data-file]');
+    const fileName = container ? container.getAttribute('data-file') : null;
+
     if (!fileName) {
         alert('No se especificó ningún archivo para cargar.');
         return;
@@ -149,6 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const filePath = `/uploads/${fileName}`;
     renderLogFile(filePath);
 });
+
 
 function renderLogFile(filepath) {
     fetch(filepath)
