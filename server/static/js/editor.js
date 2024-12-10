@@ -12,25 +12,27 @@ function paginate(data, page = 1) {
 
 // Función para actualizar la tabla según la página actual
 function updateTable(data) {
+    data.sort((a, b) => {
+        const fechaA = a.fecha.split('/').reverse().join('');
+        const fechaB = b.fecha.split('/').reverse().join('');
+        return fechaA.localeCompare(fechaB) || a.hora.localeCompare(b.hora);
+    });
+
     const tbody = document.getElementById('log-table').querySelector('tbody');
     tbody.innerHTML = ''; // Limpiar la tabla
 
-    const paginatedData = paginate(data, currentPage); // Obtener datos de la página actual
+    const paginatedData = paginate(data, currentPage); // Obtener datos paginados
     paginatedData.forEach(row => {
         const tr = document.createElement('tr');
+        tr.setAttribute('data-first-value', row.first_value || ''); // Asignar atributo personalizado
 
-        // Crear las celdas para los datos
+        // Crear celdas
         const tipoEventoTd = document.createElement('td');
         tipoEventoTd.textContent = row.tipo_evento;
         tr.appendChild(tipoEventoTd);
 
         const rutTd = document.createElement('td');
         rutTd.textContent = row.rut_encriptado;
-
-        // Resaltar en amarillo si es duplicado
-        if (row.estado === "DUPLICADO") {
-            rutTd.style.backgroundColor = 'yellow';
-        }
         tr.appendChild(rutTd);
 
         const horaTd = document.createElement('td');
@@ -44,9 +46,8 @@ function updateTable(data) {
         tbody.appendChild(tr);
     });
 
-    updatePaginationControls(data.length); // Actualizar los controles de paginación
+    updatePaginationControls(data.length); // Actualizar controles de paginación
 }
-
 
 function showDuplicatesPopup(duplicates) {
     // Crear una nueva ventana con dimensiones ajustadas
@@ -100,38 +101,36 @@ function showDuplicatesPopup(duplicates) {
     popup.document.close();
 }
 
+// Función para actualizar controles de paginación
 function updatePaginationControls(totalRows) {
-    const totalPages = Math.ceil(totalRows / rowsPerPage); // Calcular número total de páginas
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
     const paginationControls = document.getElementById('pagination-controls');
-    paginationControls.innerHTML = ''; // Limpiar controles existentes
+    paginationControls.innerHTML = '';
 
-    // Crear un contenedor para centrar los controles
     const controlContainer = document.createElement('div');
     controlContainer.style.display = 'flex';
     controlContainer.style.justifyContent = 'center';
     controlContainer.style.alignItems = 'center';
-    controlContainer.style.gap = '10px'; // Espaciado entre elementos
+    controlContainer.style.gap = '10px';
 
-    // Botón "Anterior"
     if (currentPage > 1) {
         const prevButton = document.createElement('button');
         prevButton.textContent = 'Anterior';
         prevButton.className = 'btn btn-primary';
         prevButton.onclick = () => {
-            currentPage--; // Retrocede una página
-            updateTable(currentData); // Actualizar la tabla
+            currentPage--;
+            updateTable(currentData);
         };
         controlContainer.appendChild(prevButton);
     }
 
-    // Botón "Siguiente"
     if (currentPage < totalPages) {
         const nextButton = document.createElement('button');
         nextButton.textContent = 'Siguiente';
         nextButton.className = 'btn btn-primary';
         nextButton.onclick = () => {
-            currentPage++; // Avanza una página
-            updateTable(currentData); // Actualizar la tabla
+            currentPage++;
+            updateTable(currentData);
         };
         controlContainer.appendChild(nextButton);
     }
@@ -139,17 +138,17 @@ function updatePaginationControls(totalRows) {
     paginationControls.appendChild(controlContainer);
 }
 
+// Función para renderizar el archivo .log
 document.addEventListener('DOMContentLoaded', () => {
-    const fileName = document.body.getAttribute('data-file'); // Obtiene el archivo del atributo data-file
+    const fileName = document.body.getAttribute('data-file');
     if (!fileName) {
         alert('No se especificó ningún archivo para cargar.');
         return;
     }
 
-    const filePath = `/uploads/${fileName}`; // Ruta al archivo en el servidor
-    renderLogFile(filePath); // Llama a la función para renderizar el archivo
+    const filePath = `/uploads/${fileName}`;
+    renderLogFile(filePath);
 });
-
 
 function renderLogFile(filepath) {
     fetch(filepath)
@@ -173,15 +172,14 @@ function renderLogFile(filepath) {
                 };
             }).filter(row => row !== null);
 
-            currentPage = 1; // Reiniciar la paginación
-            updateTable(currentData); // Actualizar tabla con datos paginados
+            currentPage = 1;
+            updateTable(currentData);
         })
         .catch(error => {
             console.error('Error al renderizar el archivo:', error);
             alert('No se pudo cargar el archivo. Verifica que haya sido subido correctamente.');
         });
 }
-
 
 
 // Obtener el nombre del archivo cargado y enviarlo al servidor
@@ -224,44 +222,6 @@ async function findDuplicates() {
     }
 }
 
-function updateTable(data) {
-    // Ordenar los datos por fecha y hora
-    data.sort((a, b) => {
-        const fechaA = a.fecha.split('/').reverse().join('');
-        const fechaB = b.fecha.split('/').reverse().join('');
-        return fechaA.localeCompare(fechaB) || a.hora.localeCompare(b.hora);
-    });
-
-    const tbody = document.getElementById('log-table').querySelector('tbody');
-    tbody.innerHTML = ''; // Limpiar la tabla
-
-    const paginatedData = paginate(data, currentPage); // Obtener datos paginados
-    paginatedData.forEach(row => {
-        const tr = document.createElement('tr');
-        tr.setAttribute('data-first-value', row.first_value || ''); // Asignar atributo personalizado
-
-        // Crear celdas
-        const tipoEventoTd = document.createElement('td');
-        tipoEventoTd.textContent = row.tipo_evento;
-        tr.appendChild(tipoEventoTd);
-
-        const rutTd = document.createElement('td');
-        rutTd.textContent = row.rut_encriptado;
-        tr.appendChild(rutTd);
-
-        const horaTd = document.createElement('td');
-        horaTd.textContent = row.hora;
-        tr.appendChild(horaTd);
-
-        const fechaTd = document.createElement('td');
-        fechaTd.textContent = row.fecha;
-        tr.appendChild(fechaTd);
-
-        tbody.appendChild(tr);
-    });
-
-    updatePaginationControls(data.length); // Actualizar controles de paginación
-}
 // Modificar removeDuplicates para trabajar con el archivo completo
 async function removeDuplicates() {
     if (!currentData.length) {
@@ -408,6 +368,8 @@ async function correctConsecutiveEvents() {
         return;
     }
 
+    console.log('Datos enviados para corrección de eventos consecutivos:', currentData); // Depuración
+
     const response = await fetch('/correct-consecutive-events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -416,6 +378,7 @@ async function correctConsecutiveEvents() {
 
     const result = await response.json();
     if (result.message) {
+        console.log('Respuesta del servidor para corrección de eventos consecutivos:', result); // Depuración
         showNotification(result.message);
         currentData = result.resultados; // Actualizar datos globales
         updateTable(currentData); // Refrescar la tabla con los datos corregidos (si aplica)
@@ -436,13 +399,13 @@ async function insertMissingExits() {
         });
 
         const result = await response.json();
-        console.log('Datos recibidos del backend:', result.resultados); // DEBUG
+        console.log('Datos recibidos del backend:', result.resultados); // Depuración: Verificar respuesta del backend
 
         if (response.ok) {
             showNotification(result.message);
-            currentData = result.resultados; // Actualiza los datos
+            currentData = result.resultados; // Actualizar los datos globales
             currentPage = 1;
-            updateTable(currentData); // Actualiza la tabla
+            updateTable(currentData); // Refrescar la tabla
         } else {
             showNotification('Error al procesar los datos: ' + result.message);
         }
@@ -452,3 +415,12 @@ async function insertMissingExits() {
     }
 }
 
+// Función para mostrar notificaciones al usuario
+function showNotification(message) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.style.display = 'block';
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
+}
