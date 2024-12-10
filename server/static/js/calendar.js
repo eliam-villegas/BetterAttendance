@@ -69,7 +69,7 @@ function renderCalendar(month, year) {
 
             // Mostrar el archivo asociado si existe
             const fileName = dayElement.getAttribute("data-file");
-            const editorButton = document.querySelector(".btn-edit");
+            const editorButton = document.querySelector(".btn-primary");
 
             if (fileName) {
                 fileNameDisplay.textContent = `Archivo: ${fileName}`;
@@ -129,24 +129,18 @@ async function loadFileContent() {
 
     const formData = new FormData();
     formData.append('file', file);
-
     try {
         const response = await fetch('/upload_file', { 
             method: 'POST',
             body: formData,
         });
-
         const result = await response.json();
         if (result.message) {
-            // Mostrar notificación de éxito
             showNotification(result.message);
 
-            // Actualizar el nombre del archivo en la interfaz
             const fileNameDisplay = document.getElementById('file-name-display');
             fileNameDisplay.textContent = `Archivo: ${file.name}`;
 
-            // Enviar la fecha y el nombre del archivo al servidor si es necesario
-            sendDateAndFileName(file.name);
         }
     } catch (error) {
         showNotification('Error al subir el archivo. Por favor, intenta de nuevo.');
