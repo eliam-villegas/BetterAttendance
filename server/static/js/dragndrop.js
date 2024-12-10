@@ -39,6 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleFileSelection(file) {
         fileNameDisplay.textContent = file.name;
         fileSelectedMessage.classList.remove('d-none');
-        document.getElementById('uploadForm').submit();
+        //document.getElementById('uploadForm').submit();
     }
 });

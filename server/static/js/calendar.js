@@ -69,7 +69,7 @@ function renderCalendar(month, year) {
 
             // Mostrar el archivo asociado si existe
             const fileName = dayElement.getAttribute("data-file");
-            const editorButton = document.querySelector(".btn-primary");
+            const editorButton = document.querySelector(".btn-edit");
 
             if (fileName) {
                 fileNameDisplay.textContent = `Archivo: ${fileName}`;
@@ -118,45 +118,61 @@ function loadFileData() {
         });
 }
 
-async function loadFileContent(event) {
-    const file = event.target.files[0];
-
-    // Verifica el valor de selectedDate
-    console.log('Fecha antes de enviar:', selectedDate);  // Asegúrate de que la fecha es correcta
+async function loadFileContent() {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
 
     if (!file) {
-        showNotification('Por favor, seleccione un archivo válido.');
-        return;
-    }
-
-    if (!selectedDate) {
-        showNotification('Por favor, selecciona una fecha en el calendario.');
+        showNotification('Por favor, selecciona un archivo.');
         return;
     }
 
     const formData = new FormData();
-    let newDate = selectedDate;  // Aquí se usa el valor de selectedDate, debería ser algo como "3/11/2024"
-    console.log('Datos a enviar al backend:', { date: newDate, file: file.name }); // Verifica que la fecha esté aquí
-
-    formData.append('date', selectedDate);  // Enviar la fecha seleccionada tal cual
     formData.append('file', file);
 
-    // Realizar la solicitud AJAX
-    const response = await fetch('/upload_file', {
-        method: 'POST',
-        body: formData // El navegador se encargará del Content-Type
-    });
+    try {
+        const response = await fetch('/upload_file', { 
+            method: 'POST',
+            body: formData,
+        });
 
-    const result = await response.json();
-    if (result.message) {
-        const message = result.message || 'Archivo cargado correctamente.';
-        console.log('Success message:', message);  // Verifica el mensaje
-        showNotification(message);
-        fileData[selectedDate] = file.name;  // Actualiza localmente el archivo asociado
-        renderCalendar(currentMonth, currentYear);
+        const result = await response.json();
+        if (result.message) {
+            // Mostrar notificación de éxito
+            showNotification(result.message);
+
+            // Actualizar el nombre del archivo en la interfaz
+            const fileNameDisplay = document.getElementById('file-name-display');
+            fileNameDisplay.textContent = `Archivo: ${file.name}`;
+
+            // Enviar la fecha y el nombre del archivo al servidor si es necesario
+            sendDateAndFileName(file.name);
+        }
+    } catch (error) {
+        showNotification('Error al subir el archivo. Por favor, intenta de nuevo.');
     }
 }
 
+
+
+async function sendDateAndFileName(fileName) {
+    const data = {
+        date: selectedDate, 
+        file: fileName  
+    };
+
+    const response = await fetch('/update_metadata', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)  
+    });
+
+    const result = await response.json();
+
+    if (result.message) {
+        showNotification(result.message);
+    }
+}
 
 // Navegación entre meses
 document.getElementById("prev-month").addEventListener("click", () => {
@@ -181,4 +197,9 @@ document.getElementById("next-month").addEventListener("click", () => {
 document.addEventListener('DOMContentLoaded', () => {
     loadFileData(); // Cargar el archivo JSON
     renderCalendar(currentMonth, currentYear); // Renderizar el calendario
+});
+
+
+document.getElementById('uploadForm').addEventListener('submit', function (event) {
+    event.preventDefault(); // Evitar que el formulario recargue la página
 });

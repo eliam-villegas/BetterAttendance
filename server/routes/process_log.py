@@ -28,51 +28,57 @@ def clean_upload_folder():
                 os.remove(file_path)
                 print(f"Archivo eliminado: {file_path}")
 
-@process_log_bp.route('/upload_file', methods=['GET','POST'])
+@process_log_bp.route('/upload_file', methods=['POST'])
 def upload_file():
+    print(f"Method: {request.method}, Files: {request.files}")
     if request.method == 'POST':
         if 'file' not in request.files:
             return jsonify({'message': 'No se recibió ningún archivo.'}), 400
 
-        date = request.form.get('date', '3/11/2024')
         file = request.files.get('file')
-
-        if not date:
-            return jsonify({'message': 'No se recibió ninguna fecha.'}), 400
 
         if not file or file.filename == '':
             return jsonify({'message': 'No se recibió ningún archivo.'}), 400
-        
+
         try:
             file.save(os.path.join(UPLOAD_FOLDER, file.filename))
-            update_metadata(file.filename, date)
-            return redirect(url_for('calendar'))  
-            #return render_template('index.html')
+            return jsonify({'message': 'Archivo subido correctamente.'}), 200
         except Exception as e:
             print(f"Error: {str(e)}")
-            return jsonify({'message': 'Error al guardar el archivo o actualizar los metadatos.'}), 500
+            return jsonify({'message': 'Error al guardar el archivo.'}), 500
 
 
+@process_log_bp.route('/update_metadata', methods=['POST'])
+def update_metadata():
+    data = request.get_json()
 
-def update_metadata(file, date):
+    date = data.get('date')
+    file_name = data.get('file')
+
+    if not date or not file_name:
+        return jsonify({'message': 'Faltan datos importantes: fecha y nombre de archivo.'}), 400
+
     metadata_file = os.path.join(UPLOAD_FOLDER, "metadata.json")
-    
-    # Lee el archivo de metadata si existe, si no, crea una lista vacía
-    if os.path.exists(metadata_file):
-        with open(metadata_file, 'r') as fp:
-            listObj = json.load(fp)
-    else:
-        listObj = []
-    
-    # Añade un nuevo objeto con la fecha y archivo
-    listObj.append({
-        "date": date,
-        "file": file 
-    })
-    
-    # Escribe la lista actualizada en el archivo JSON
-    with open(metadata_file, 'w') as json_file:
-        json.dump(listObj, json_file, indent=4, separators=(',', ': '))
+
+    with open(metadata_file, 'r') as fp:
+        try:
+            listObj = json.load(fp)  
+        except json.JSONDecodeError:
+            listObj = []  
+
+    new_entry = {
+        "date": date, 
+        "file": file_name  
+    }
+    listObj.append(new_entry)
+    try:
+        with open(metadata_file, 'w') as json_file:
+            json.dump(listObj, json_file, indent=4, separators=(',', ': '))
+    except Exception as e:
+        print(f"Error al guardar metadata.json: {str(e)}")
+        return jsonify({'message': 'Error al actualizar el archivo metadata.json.'}), 500
+
+    return jsonify({'message': 'Datos actualizados.'}), 200
  
 
 @process_log_bp.route('/find-duplicates', methods=['POST'])
