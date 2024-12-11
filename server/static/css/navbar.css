@@ -82,3 +82,34 @@ header .navbar {
 .navbar .nav-link {
     font-size: 18px; /* Incrementa el tamaño del texto */
 }
+
+/* Evitar que el menú desplegable cause overflow horizontal */
+.dropdown-menu {
+    position: absolute;
+    left: auto;
+    right: 0; /* Forzar el menú a alinearse al borde derecho del dropdown */
+    z-index: 1050; /* Asegurar que el menú esté por encima de otros elementos */
+    max-width: 300px; /* Ajustar el ancho máximo del menú */
+    overflow-wrap: break-word; /* Ajustar contenido largo */
+    word-wrap: break-word; /* Compatibilidad con navegadores antiguos */
+    white-space: normal; /* Permitir el ajuste de líneas dentro del menú */
+}
+
+/* Ajustar el tamaño del menú desplegable */
+.dropdown-menu li a {
+    font-size: 16px; /* Cambia el tamaño de la fuente */
+    padding: 10px 15px; /* Ajusta el relleno interno */
+}
+
+/* Ajustar el fondo y bordes del menú */
+.dropdown-menu {
+    background-color: #f8f9fa; /* Cambiar el fondo del menú */
+    border: 1px solid #ddd; /* Bordes suaves */
+    border-radius: 8px; /* Bordes redondeados */
+}
+
+/* Opcional: Cambiar el tamaño del icono del dropdown */
+.navbar .nav-link.dropdown-toggle {
+    font-size: 18px; /* Cambiar tamaño del texto del botón */
+    padding: 8px 15px; /* Ajustar relleno */
+}

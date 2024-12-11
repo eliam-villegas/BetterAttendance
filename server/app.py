@@ -4,6 +4,7 @@ from api_handling import ApiHandler
 from routes.process_log import process_log_bp  # Importa el Blueprint
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from werkzeug.security import generate_password_hash
 #from Gitlike import Gitlike
 import os
 
@@ -45,17 +46,29 @@ def admin_panel():
     cur = conn.cursor(cursor_factory=RealDictCursor)  # Para obtener los resultados como diccionarios
 
     # Obtener todos los usuarios de la base de datos
-    cur.execute("SELECT id, username, role FROM users WHERE role = 'user'")
+    cur.execute("SELECT id, username, role FROM users")
     users = cur.fetchall()
+
+    # Separar los usuarios por rol
+    users_admin = [user for user in users if user['role'] == 'admin']
+    users_user = [user for user in users if user['role'] == 'user']
 
     cur.close()
     conn.close()
 
-    return render_template('admin_panel.html', users=users)
+    return render_template(
+        'admin_panel.html',
+        users_admin=users_admin,
+        users_user=users_user
+    )
+
 
 
 @app.route('/admin/edit_user/<int:user_id>', methods=['GET', 'POST'])
 def edit_user(user_id):
+    if g.role != 'admin':
+        return redirect(url_for('calendar'))  # Redirige si no es administrador
+
     conn = get_db_connection()
     cur = conn.cursor()
 
@@ -117,6 +130,40 @@ def delete_user(user_id):
 
     flash("Usuario eliminado exitosamente.", "success")
     return redirect(url_for('admin_panel'))
+
+@app.route('/add_user', methods=['POST'])
+def add_user():
+    if g.role != 'admin':
+        return redirect(url_for('calendar'))  # Restringir acceso a administradores
+
+    username = request.form['username']
+    password = request.form['password']
+    role = request.form['role']
+
+    # Validación básica
+    if not username or not password or not role:
+        flash(('danger', 'Todos los campos son obligatorios'))
+        return redirect(url_for('admin_panel'))
+
+    hashed_password = generate_password_hash(password)  # Encriptar la contraseña
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # Insertar nuevo usuario
+    try:
+        cur.execute("INSERT INTO users (username, password, role) VALUES (%s, %s, %s)",
+                    (username, hashed_password, role))
+        conn.commit()
+        flash(('success', 'Usuario agregado con éxito'))
+    except Exception as e:
+        flash(('danger', 'Error al agregar usuario: ' + str(e)))
+    finally:
+        cur.close()
+        conn.close()
+
+    return redirect(url_for('admin_panel'))
+
 
 @app.route('/logout')
 def logout():

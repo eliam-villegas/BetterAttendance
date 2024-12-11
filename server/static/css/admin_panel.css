@@ -1,0 +1,51 @@
+.admin-panel {
+    margin: 20px auto;
+    max-width: 90%;
+}
+
+h1, h2 {
+    text-align: center;
+    margin-top: 20px;
+    color: #333;
+}
+
+.table {
+    margin: 20px auto;
+    width: 100%;
+    max-width: 90%;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.table th, .table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.pagination {
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.btn-action {
+    margin: 0 5px;
+}
+
+.text-end {
+    text-align: right;
+}
+
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header, .modal-footer {
+    background-color: #f8f9fa;
+}
+
+.modal-title {
+    font-weight: bold;
+}
+

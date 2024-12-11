@@ -1,0 +1,21 @@
+.edit-user-panel {
+    margin: 20px auto;
+    max-width: 600px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.edit-user-panel h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.btn-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
