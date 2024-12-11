@@ -4,3 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     role VARCHAR(20) NOT NULL DEFAULT 'user'  
 );
+
+INSERT INTO users (username, password, role)
+VALUES ('admin', 'adminpassword', 'admin')
+ON CONFLICT (username) DO NOTHING;

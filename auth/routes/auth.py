@@ -78,3 +78,32 @@ def register():
         return redirect(url_for('auth.login'))  # Redirigir al login después del registro
 
     return render_template('register.html')
+
+@auth_bp.before_app_request
+def hash_passwords():
+    # Conectar a la base de datos
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # Seleccionar todos los usuarios 
+    cur.execute("SELECT id, password FROM users")
+    admins = cur.fetchall()
+
+    for admin in admins:
+        admin_id, password = admin
+
+        # Verificar si la contraseña ya está hasheada
+        if not password.startswith("pbkdf2:sha256"):
+            # Si no está hasheada, generar el hash
+            hashed_password = generate_password_hash(password)
+
+            # Actualizar la contraseña en la base de datos
+            cur.execute(
+                "UPDATE users SET password = %s WHERE id = %s",
+                (hashed_password, admin_id)
+            )
+
+    # Confirmar los cambios y cerrar conexión
+    conn.commit()
+    cur.close()
+    conn.close()
