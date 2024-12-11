@@ -107,6 +107,12 @@ def delete_user(user_id):
     flash("Usuario eliminado exitosamente.", "success")
     return redirect(url_for('admin_panel'))
 
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash("Has cerrado sesión.", "info")
+    return redirect('http://localhost:5001/login')
+
 
 @app.route('/')
 def login():
