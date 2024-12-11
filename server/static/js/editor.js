@@ -10,7 +10,6 @@ function paginate(data, page = 1) {
     return data.slice(start, end);
 }
 
-// Función para actualizar la tabla según la página actual
 function updateTable(data) {
     data.sort((a, b) => {
         const fechaA = a.fecha.split('/').reverse().join('');
@@ -22,7 +21,7 @@ function updateTable(data) {
     tbody.innerHTML = ''; // Limpiar la tabla
 
     const paginatedData = paginate(data, currentPage); // Obtener datos paginados
-    paginatedData.forEach(row => {
+    paginatedData.forEach((row, index) => {
         const tr = document.createElement('tr');
         tr.setAttribute('data-first-value', row.first_value || ''); // Asignar atributo personalizado
 
@@ -43,10 +42,59 @@ function updateTable(data) {
         fechaTd.textContent = row.fecha;
         tr.appendChild(fechaTd);
 
+        // Crear la celda para los botones de acción
+        const actionTd = document.createElement('td');
+        actionTd.className = 'd-flex justify-content-around';
+
+        // Botón "X" para eliminar
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'X';
+        deleteButton.className = 'btn btn-danger btn-sm';
+        deleteButton.onclick = () => {
+            deleteRow(index + (currentPage - 1) * rowsPerPage); // Calcula el índice global
+        };
+        actionTd.appendChild(deleteButton);
+
+        // Botón "M" para modificar
+        const modifyButton = document.createElement('button');
+        modifyButton.textContent = 'M';
+        modifyButton.className = 'btn btn-warning btn-sm';
+        modifyButton.onclick = () => {
+            modifyRow(index + (currentPage - 1) * rowsPerPage); // Calcula el índice global
+        };
+        actionTd.appendChild(modifyButton);
+
+        tr.appendChild(actionTd);
+
         tbody.appendChild(tr);
     });
 
     updatePaginationControls(data.length); // Actualizar controles de paginación
+}
+
+// Función para eliminar una fila
+function deleteRow(globalIndex) {
+    const deletedRow = currentData.splice(globalIndex, 1); // Eliminar de currentData
+    console.log('Fila eliminada:', deletedRow); // Depuración
+    updateTable(currentData); // Actualizar la tabla
+}
+
+// Función para modificar una fila
+function modifyRow(globalIndex) {
+    const row = currentData[globalIndex];
+    const newTipoEvento = prompt('Modificar Tipo de Evento (Entrada/Salida):', row.tipo_evento);
+    const newRUT = prompt('Modificar RUT:', row.rut_encriptado);
+    const newHora = prompt('Modificar Hora (HH:MM):', row.hora);
+    const newFecha = prompt('Modificar Fecha (DD/MM/YY):', row.fecha);
+
+    // Validar si los valores son proporcionados
+    if (newTipoEvento) row.tipo_evento = newTipoEvento;
+    if (newRUT) row.rut_encriptado = newRUT;
+    if (newHora) row.hora = newHora;
+    if (newFecha) row.fecha = newFecha;
+
+    console.log('Fila modificada:', row); // Depuración
+    updateTable(currentData); // Actualizar la tabla
 }
 
 function showDuplicatesPopup(duplicates) {
@@ -183,7 +231,6 @@ function renderLogFile(filepath) {
             alert('No se pudo cargar el archivo. Verifica que haya sido subido correctamente.');
         });
 }
-
 
 // Obtener el nombre del archivo cargado y enviarlo al servidor
 function getFilePath() {
@@ -371,17 +418,18 @@ async function correctConsecutiveEvents() {
         return;
     }
 
-    console.log('Datos enviados para corrección de eventos consecutivos:', currentData); // Depuración
+    console.log('Datos enviados para corrección de eventos consecutivos:', currentData); // Debug
 
     const response = await fetch('/correct-consecutive-events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: currentData })
+        body: JSON.stringify({ data: currentData }),
     });
 
     const result = await response.json();
+    console.log('Respuesta del servidor para corrección de eventos consecutivos:', result); // Debug
+
     if (result.message) {
-        console.log('Respuesta del servidor para corrección de eventos consecutivos:', result); // Depuración
         showNotification(result.message);
         currentData = result.resultados; // Actualizar datos globales
         updateTable(currentData); // Refrescar la tabla con los datos corregidos (si aplica)
@@ -427,3 +475,30 @@ function showNotification(message) {
         notification.style.display = 'none';
     }, 3000);
 }
+
+function addNewRecord() {
+    const eventType = document.getElementById('event-type').value;
+    const rut = document.getElementById('rut').value;
+    const time = document.getElementById('time').value;
+    const date = document.getElementById('date').value;
+
+    if (!eventType || !rut || !time || !date) {
+        alert('Por favor, complete todos los campos.');
+        return;
+    }
+
+    const newRecord = {
+        tipo_evento: eventType,
+        rut_encriptado: rut,
+        hora: time,
+        fecha: date,
+    };
+
+    currentData.push(newRecord); // Agregar el registro a los datos actuales
+    updateTable(currentData); // Actualizar la tabla
+    alert('Nuevo registro agregado exitosamente.');
+
+    // Limpiar el formulario
+    document.getElementById('add-record-form').reset();
+}
+

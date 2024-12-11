@@ -22,6 +22,7 @@
                         <th>RUT</th>
                         <th>Hora</th>
                         <th>Fecha</th>
+                        <th>Acción</th> <!-- Nueva columna para el botón -->
                     </tr>
                 </thead>
                 <tbody>
@@ -49,6 +50,33 @@
     <a href="#" onclick="correctConsecutiveEvents()">Corregir Eventos Consecutivos</a>
     <a href="#" onclick="checkEntriesWithoutExits()">Verificar Entradas sin Salidas</a>
     <a href="#" onclick="insertMissingExits()">Agregar Salidas Faltantes</a>
+
+    <!-- Nueva sección -->
+    <div class="add-record-section">
+        <h4>Agregar Nuevo Registro</h4>
+        <form id="add-record-form">
+            <div class="form-group">
+                <label for="event-type">Tipo de Evento</label>
+                <select id="event-type" class="form-control">
+                    <option value="Entrada">Entrada</option>
+                    <option value="Salida">Salida</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="rut">RUT</label>
+                <input type="text" id="rut" class="form-control" placeholder="Ingrese el RUT">
+            </div>
+            <div class="form-group">
+                <label for="time">Hora</label>
+                <input type="time" id="time" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="date">Fecha</label>
+                <input type="date" id="date" class="form-control">
+            </div>
+            <button type="button" class="btn btn-primary w-100" onclick="addNewRecord()">Agregar</button>
+        </form>
+    </div>
 </div>
 
 <div id="notification" class="notification"></div>

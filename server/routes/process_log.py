@@ -7,6 +7,7 @@ from scripts.find_duplicates_log import buscar_duplicados_en_lista
 from scripts.remove_duplicates_log import eliminar_duplicados_en_lista
 from scripts.find_entries_without_exit import buscar_entradas_sin_salidas
 from scripts.correct_consecutive_events import corregir_eventos_consecutivos
+from scripts.insert_missing_exits import insertar_salidas_faltantes
 
 # Crea el Blueprint
 process_log_bp = Blueprint('process_log', __name__)
@@ -114,15 +115,15 @@ def correct_consecutive_events():
     if not data:
         return jsonify({'message': 'No se recibió ningún dato.'}), 400
 
-    print("Datos recibidos para corrección de eventos consecutivos:", data)  # Depuración
+    print("Datos recibidos para corrección de eventos consecutivos:", data)  # Debug
 
     resultados, tiene_consecutivos = corregir_eventos_consecutivos(data)
 
+    print("Resultados después de corrección:", resultados)  # Debug
+
     if not tiene_consecutivos:
-        print("No se encontraron eventos consecutivos.")  # Depuración
         return jsonify({'message': 'No se encontraron eventos consecutivos.', 'resultados': resultados})
 
-    print("Eventos consecutivos corregidos:", resultados)  # Depuración
     return jsonify({'message': 'Eventos consecutivos corregidos.', 'resultados': resultados})
 
 @process_log_bp.route('/insert-missing-exits', methods=['POST'])
@@ -131,67 +132,10 @@ def insert_missing_exits():
     if not data:
         return jsonify({'message': 'No se recibió ningún dato.'}), 400
 
-    # Filtrar entradas sin salida
-    datos_procesados = buscar_entradas_sin_salidas(data)
-    sin_salida = [item for item in datos_procesados if item.get('estado') == 'SIN_SALIDA']
+    # Llamar a la función auxiliar para generar las salidas faltantes
+    updated_data, nuevas_salidas = insertar_salidas_faltantes(data)
 
-    print("Entradas sin salida:", sin_salida)
+    if not nuevas_salidas:
+        return jsonify({'message': 'No hay entradas sin salida para procesar.', 'resultados': updated_data})
 
-    if not sin_salida:
-        return jsonify({'message': 'No hay entradas sin salida para procesar.', 'resultados': data})
-
-    nuevas_salidas = []
-    for entrada in sin_salida:
-        fecha_entrada = entrada['fecha']
-        rut = entrada['rut_encriptado']
-        hora_entrada = entrada['hora']
-
-        print(f"Procesando entrada: {entrada}")
-
-        salida_sugerida = None
-
-        # Filtrar eventos del mismo RUT
-        eventos_del_rut = [evento for evento in data if evento['rut_encriptado'] == rut]
-
-        # Buscar salida del día siguiente
-        for evento in eventos_del_rut:
-            if evento['tipo_evento'] == 'Salida' and evento['fecha'] > fecha_entrada:
-                salida_sugerida = evento
-                break
-
-        # Si no se encuentra salida del día siguiente, buscar del día anterior
-        if not salida_sugerida:
-            for evento in eventos_del_rut:
-                if evento['tipo_evento'] == 'Salida' and evento['fecha'] < fecha_entrada:
-                    salida_sugerida = evento
-
-        # Si no se encuentra ninguna salida, generar una salida predeterminada
-        if not salida_sugerida:
-            print(f"No se encontró salida para la entrada {entrada}, generando salida predeterminada.")
-            nueva_salida = {
-                'tipo_evento': 'Salida',
-                'rut_encriptado': rut,
-                'hora': '18:00',  # Hora predeterminada
-                'fecha': fecha_entrada,  # Mantener la misma fecha que la entrada
-            }
-        else:
-            print(f"Salida sugerida para la entrada {entrada}: {salida_sugerida}")
-            nueva_salida = {
-                'tipo_evento': 'Salida',
-                'rut_encriptado': rut,
-                'hora': salida_sugerida['hora'],
-                'fecha': fecha_entrada,  # Mantener la misma fecha que la entrada
-            }
-
-        nuevas_salidas.append(nueva_salida)
-
-    print("Nuevas salidas generadas:", nuevas_salidas)
-
-    # Agregar las nuevas salidas al conjunto de datos
-    data.extend(nuevas_salidas)
-
-    # Marcar las entradas que ahora tienen salidas como "CON_SALIDA"
-    for entrada in sin_salida:
-        entrada['estado'] = 'CON_SALIDA'
-
-    return jsonify({'message': 'Salidas faltantes insertadas.', 'resultados': data})
+    return jsonify({'message': 'Salidas faltantes insertadas.', 'resultados': updated_data})
