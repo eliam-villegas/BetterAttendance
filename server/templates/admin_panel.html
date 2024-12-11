@@ -1,0 +1,24 @@
+<h1>Panel de Administración</h1>
+<h2>Usuarios Registrados</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre de Usuario</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.role }}</td>
+            <td>
+                <!-- Agregar botones para editar o eliminar usuarios -->
+                <a href="{{ url_for('edit_user', user_id=user.id) }}">Editar</a>
+                <a href="{{ url_for('delete_user', user_id=user.id) }}">Eliminar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

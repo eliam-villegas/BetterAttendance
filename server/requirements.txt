@@ -3,3 +3,4 @@ Flask-SocketIO==5.3.2
 Werkzeug==2.0.2
 gitpython
 eventlet
+psycopg2-binary

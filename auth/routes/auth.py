@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, g
 from werkzeug.security import generate_password_hash, check_password_hash
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -37,6 +37,8 @@ def login():
         conn.close()
 
         if user and check_password_hash(user['password'], password):
+            session['username'] = user['username']
+            session['role'] = user['role']  
             flash("Has iniciado sesión exitosamente.", "success")
             return redirect('http://localhost:5000/home')
         else:
@@ -48,21 +50,31 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-
-        hashed_password = generate_password_hash(password)
-
+        role = request.form['role']  # Obtener el rol del formulario, por defecto 'user'
+        
+        # Comprobar si el nombre de usuario ya existe
         conn = get_db_connection()
         cur = conn.cursor()
-        try:
-            cur.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password))
-            conn.commit()
-            flash("Usuario registrado exitosamente.", "success")
-            return redirect(url_for('auth.login'))
-        except psycopg2.IntegrityError:
-            conn.rollback()
-            flash("El nombre de usuario ya existe. Elige otro.", "danger") 
-        finally:
-            cur.close()
-            conn.close()
+        cur.execute("SELECT * FROM users WHERE username = %s", (username,))
+        user = cur.fetchone()
+        cur.close()
+
+        if user:
+            flash("El nombre de usuario ya está en uso.", "danger")
+            return redirect(url_for('auth.register'))
+
+        # Encriptar la contraseña antes de almacenarla
+        hashed_password = generate_password_hash(password)
+
+        # Insertar el nuevo usuario en la base de datos
+        cur = conn.cursor()
+        cur.execute("INSERT INTO users (username, password, role) VALUES (%s, %s, %s)", 
+                    (username, hashed_password, role))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        flash("Usuario registrado exitosamente.", "success")
+        return redirect(url_for('auth.login'))  # Redirigir al login después del registro
 
     return render_template('register.html')
