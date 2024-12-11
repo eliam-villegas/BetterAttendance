@@ -477,28 +477,55 @@ function showNotification(message) {
 }
 
 function addNewRecord() {
-    const eventType = document.getElementById('event-type').value;
-    const rut = document.getElementById('rut').value;
-    const time = document.getElementById('time').value;
-    const date = document.getElementById('date').value;
+    const eventType = document.getElementById('event-type').value; // Tipo de evento (Entrada/Salida)
+    const rut = document.getElementById('rut').value; // RUT ingresado por el usuario
+    const time = document.getElementById('time').value; // Hora ingresada por el usuario
+    const date = document.getElementById('date').value; // Fecha seleccionada desde el calendario
 
     if (!eventType || !rut || !time || !date) {
         alert('Por favor, complete todos los campos.');
         return;
     }
 
+    // Formatear la fecha seleccionada
+    const [year, month, day] = date.split('-');
+    const shortYear = year.slice(-2);
+    const formattedDate = `${day}/${month}/${shortYear}`;
+
+    // Crear el nuevo registro
     const newRecord = {
         tipo_evento: eventType,
         rut_encriptado: rut,
         hora: time,
-        fecha: date,
+        fecha: formattedDate,
     };
 
-    currentData.push(newRecord); // Agregar el registro a los datos actuales
+    // Insertar el nuevo registro en la posición correcta de currentData
+    let inserted = false;
+    for (let i = 0; i < currentData.length; i++) {
+        const existingRecord = currentData[i];
+        const existingDate = existingRecord.fecha.split('/').reverse().join(''); // Revertir fecha existente
+        const existingTime = existingRecord.hora;
+
+        const newDate = formattedDate.split('/').reverse().join(''); // Revertir nueva fecha
+        const newTime = time;
+
+        // Comparar fecha y hora
+        if (newDate < existingDate || (newDate === existingDate && newTime < existingTime)) {
+            currentData.splice(i, 0, newRecord); // Insertar en la posición actual
+            inserted = true;
+            break;
+        }
+    }
+
+    // Si no se insertó, agregar al final
+    if (!inserted) {
+        currentData.push(newRecord);
+    }
+
     updateTable(currentData); // Actualizar la tabla
     alert('Nuevo registro agregado exitosamente.');
 
-    // Limpiar el formulario
+    // Limpiar el formulario después de agregar el registro
     document.getElementById('add-record-form').reset();
 }
-
