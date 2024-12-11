@@ -1,14 +1,39 @@
+/* Barra lateral */
 .sidebar {
-    height: 100%;
-    width: 0;
-    position: fixed;
-    right: 0;
-    top: 0;
+    width: 300px; /* Ancho fijo */
     background-color: #f8f9fa;
-    overflow-x: hidden;
-    transition: 0.3s;
-    padding-top: 60px;
+    padding: 10px;
     border-left: 1px solid #ddd;
+    overflow-y: auto; /* Permite desplazamiento si el contenido es largo */
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    bottom: 0; /* Asegura que ocupe toda la altura */
+}
+
+/* Contenedor principal para el diseño */
+.main-layout {
+    display: flex;
+    height: 120vh; /* Altura completa de la ventana */
+}
+
+/* Contenido principal */
+.main-content {
+    flex: 1; /* Ocupa todo el espacio disponible */
+    padding: 45px;
+}
+
+/* Ajuste del contenido principal para que no sea tapado */
+.container {
+    margin-right: 180px; /* Mismo ancho que la barra lateral */
+    margin-top: -160px
+}
+
+/* Ajustes para el botón de guardar y otros elementos al final */
+.text-end {
+    position: sticky;
+    background-color: #fff;
+    border-top: 1px solid #ddd;
 }
 
 .sidebar a {
@@ -24,20 +49,9 @@
     color: #007bff;
 }
 
-/* Botón para abrir y cerrar la barra */
+/* Elimina el botón de apertura/cierre */
 .toggle-btn {
-    position: fixed;
-    top: 160px; /* Coloca el botón cerca del borde superior */
-    right: 0;
-    font-size: 20px;
-    cursor: pointer;
-    color: #333;
-    background-color: #f8f9fa;
-    border: 1px solid #ddd;
-    padding: 5px 10px;
-    border-radius: 5px 0 0 5px;
-    z-index: 1;
-    transition: right 0.3s; /* Transición para que el botón se mueva suavemente */
+    display: none;
 }
 
 #editor-container {

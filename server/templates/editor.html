@@ -7,82 +7,81 @@
 {% endblock %}
 
 {% block content %}
-<div class="container d-flex flex-column justify-content-center align-items-center min-vh-100" data-file="{{ file_name }}">
-    <div class="md-6">
-        <div class="col text-start">
-            <h2 class="title-sub">Visualización de Archivo Log</h2>
-        </div>
+<div class="main-layout">
+    <!-- Contenido principal -->
+    <div class="container main-content d-flex flex-column justify-content-center align-items-center min-vh-100" data-file="{{ file_name }}">
+        <div class="md-6">
+            <div class="col text-start">
+                <h2 class="title-sub">Visualización de Archivo Log</h2>
+            </div>
 
-        <!-- Tabla para mostrar el contenido del archivo log -->
-        <div class="table-responsive mb-3" style="max-height: 800px; overflow-y: auto;">
-            <table id="log-table" class="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th>Tipo de Evento</th>
-                        <th>RUT</th>
-                        <th>Hora</th>
-                        <th>Fecha</th>
-                        <th>Acción</th> <!-- Nueva columna para el botón -->
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Filas de datos generadas dinámicamente -->
-                </tbody>
-            </table>
-        </div>
+            <!-- Tabla para mostrar el contenido del archivo log -->
+            <div class="table-responsive mb-3" style="max-height: 800px; overflow-y: auto;">
+                <table id="log-table" class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Tipo de Evento</th>
+                            <th>RUT</th>
+                            <th>Hora</th>
+                            <th>Fecha</th>
+                            <th>Acción</th> <!-- Nueva columna para el botón -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Filas de datos generadas dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
 
-        <div class="pagination-container" id="pagination-controls"></div>
+            <div class="pagination-container" id="pagination-controls"></div>
 
-        <!-- Botón para guardar cambios en la tabla -->
-        <div class="text-end">
-            <button class="btn btn-success" onclick="saveTableContent()">Guardar Cambios</button>
+            <!-- Botón para guardar cambios en la tabla -->
+            <div class="text-end">
+                <button class="btn btn-success" onclick="saveTableContent()">Guardar Cambios</button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Botón para abrir/cerrar la barra lateral -->
-<div id="toggleButton" class="toggle-btn" onclick="toggleSidebar()">☰</div>
+    <!-- Barra lateral fija a la derecha -->
+    <div id="mySidebar" class="sidebar">
+        <a href="#" onclick="findDuplicates()">Buscar Duplicados</a>
+        <a href="#" onclick="removeDuplicates()">Eliminar Duplicados</a>
+        <a href="#" onclick="correctConsecutiveEvents()">Corregir Eventos Consecutivos</a>
+        <a href="#" onclick="checkEntriesWithoutExits()">Verificar Entradas sin Salidas</a>
+        <a href="#" onclick="insertMissingExits()">Agregar Salidas Faltantes</a>
 
-<!-- Barra lateral derecha -->
-<div id="mySidebar" class="sidebar">
-    <a href="#" onclick="findDuplicates()">Buscar Duplicados</a>
-    <a href="#" onclick="removeDuplicates()">Eliminar Duplicados</a>
-    <a href="#" onclick="correctConsecutiveEvents()">Corregir Eventos Consecutivos</a>
-    <a href="#" onclick="checkEntriesWithoutExits()">Verificar Entradas sin Salidas</a>
-    <a href="#" onclick="insertMissingExits()">Agregar Salidas Faltantes</a>
-
-    <!-- Nueva sección -->
-    <div class="add-record-section">
-        <h4>Agregar Nuevo Registro</h4>
-        <form id="add-record-form">
-            <div class="form-group">
-                <label for="event-type">Tipo de Evento</label>
-                <select id="event-type" class="form-control">
-                    <option value="Entrada">Entrada</option>
-                    <option value="Salida">Salida</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="rut">RUT</label>
-                <input type="text" id="rut" class="form-control" placeholder="Ingrese el RUT">
-            </div>
-            <div class="form-group">
-                <label for="time">Hora</label>
-                <input type="time" id="time" class="form-control">
-            </div>
-            <div class="form-group">
-                <label for="date">Fecha</label>
-                <input type="date" id="date" class="form-control">
-            </div>
-            <button type="button" class="btn btn-primary w-100" onclick="addNewRecord()">Agregar</button>
-        </form>
+        <div class="add-record-section">
+            <h4>Agregar Nuevo Registro</h4>
+            <form id="add-record-form">
+                <div class="form-group">
+                    <label for="event-type">Tipo de Evento</label>
+                    <select id="event-type" class="form-control">
+                        <option value="Entrada">Entrada</option>
+                        <option value="Salida">Salida</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="rut">RUT</label>
+                    <input type="text" id="rut" class="form-control" placeholder="Ingrese el RUT">
+                </div>
+                <div class="form-group">
+                    <label for="time">Hora</label>
+                    <input type="time" id="time" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="date">Fecha</label>
+                    <input type="date" id="date" class="form-control">
+                </div>
+                <button type="button" class="btn btn-primary w-100" onclick="addNewRecord()">Agregar</button>
+            </form>
+        </div>
     </div>
 </div>
 
 <div id="notification" class="notification"></div>
 
 <!-- Scripts -->
-    <script src="static/js/editor.js"></script> <!-- Script para procesar el log -->
-    <script src="static/js/barralateral.js"></script>
-    <script src="static/js/notificacion.js"></script>
+<script src="static/js/editor.js"></script> <!-- Script para procesar el log -->
+<script src="static/js/barralateral.js"></script>
+<script src="static/js/notificacion.js"></script>
 {% endblock %}
