@@ -19,7 +19,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB para el tamano de a
 UPLOADS_PATH = os.path.join(os.path.dirname(__file__), 'uploads')
 app.config['UPLOADS_PATH'] = UPLOADS_PATH
 app.secret_key = 'supersecretkey'  # pa que funcione `flash`
-app.config['SESSION_COOKIE_DOMAIN'] = '.miapp.com'
+app.config['SESSION_COOKIE_DOMAIN'] = None
 
 def get_db_connection():
     conn = psycopg2.connect(
@@ -41,7 +41,18 @@ def admin_panel():
     if g.role != 'admin':
         return redirect(url_for('calendar'))  # Si no es admin, redirige al calendario
 
-    return render_template('admin_panel.html')
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)  # Para obtener los resultados como diccionarios
+
+    # Obtener todos los usuarios de la base de datos
+    cur.execute("SELECT id, username, role FROM users WHERE role = 'user'")
+    users = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template('admin_panel.html', users=users)
+
 
 @app.route('/admin/edit_user/<int:user_id>', methods=['GET', 'POST'])
 def edit_user(user_id):

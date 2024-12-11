@@ -6,7 +6,7 @@ from routes.auth import auth_bp
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'  # pa que funcione `flash`
-app.config['SESSION_COOKIE_DOMAIN'] = '.miapp.com'
+app.config['SESSION_COOKIE_DOMAIN'] = None
 
 # Registrar los blueprints
 app.register_blueprint(errors_bp)
