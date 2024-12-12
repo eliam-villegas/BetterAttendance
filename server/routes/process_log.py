@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, redirect, url_for
+from flask import Blueprint, request, jsonify, g, render_template
 import os
 import json
 from time import time
@@ -28,6 +28,15 @@ def clean_upload_folder():
             if now - os.path.getmtime(file_path) > EXPIRATION_TIME:
                 os.remove(file_path)
                 print(f"Archivo eliminado: {file_path}")
+
+#Dejo esto aca porque aqui esta la instancia de git
+@process_log_bp.route('/file_history/<file_name>')
+def file_history_ui(file_name):
+    try:
+        history = git.get_history(file_name)
+        return render_template('historial.html', file=file_name, history=history)
+    except RuntimeError as e:
+        return jsonify({'message': str(e)}), 500
 
 @process_log_bp.route('/upload_file', methods=['POST'])
 def upload_file():
@@ -70,7 +79,7 @@ def save_changes():
                 # Reconstruir línea
                 line = f"{first_value},01,{tipo_evento},{row['rut_encriptado']},0000000000,{hora},{minuto},{mes},{dia},{anio},00,00,00,00,00,0000000000,0000000000,    0.00,    0.00\n"
                 file.write(line)
-
+        git.commit(file=file_name,user=g.username,function="Guardado manual")
         return jsonify({'message': 'Cambios guardados exitosamente.'}), 200
     except Exception as e:
         print(f"Error al guardar cambios: {e}")
@@ -107,6 +116,8 @@ def update_metadata():
         print(f"Error al guardar metadata.json: {str(e)}")
         return jsonify({'message': 'Error al actualizar el archivo metadata.json.'}), 500
 
+    # forma de enviar el commit. buscar como recuperar el nombre del archivo en las otras funciones
+    git.commit(file=file_name,user=g.username,function="Subida de archivo")
     return jsonify({'message': 'Datos actualizados.'}), 200
  
 

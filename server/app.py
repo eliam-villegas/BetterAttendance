@@ -174,8 +174,8 @@ def logout():
 
 @app.route('/')
 def login():
-    #return redirect('http://localhost:5001/login')      #<-- Para producción
-    return redirect(url_for('calendar'))               # <-- Para desarrollo
+    return redirect('http://localhost:5001/login')      #<-- Para producción
+    #return redirect(url_for('calendar'))               # <-- Para desarrollo
 
 @app.route('/home')
 def calendar():

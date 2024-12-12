@@ -47,12 +47,13 @@ services:
       - .env
   
   db:
-    image: postgres:17.0
+    image: postgres:14.0
+    privileged: true
     env_file: 
       - .env
     volumes:
       - db_data:/var/lib/postgresql/data
-      - ./auth/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./auth/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - app-network
 

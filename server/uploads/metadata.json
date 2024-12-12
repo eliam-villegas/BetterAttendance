@@ -16,6 +16,7 @@
         "file": "prueba1.log"
     },
     {
+<<<<<<< HEAD
         "date": "12/12/2024",
         "file": "test1.log"
     },
@@ -26,5 +27,17 @@
     {
         "date": "14/12/2024",
         "file": "test3.log"
+=======
+        "date": "3/12/2024",
+        "file": "prueba3.log"
+    },
+    {
+        "date": "5/12/2024",
+        "file": "prueba5.log"
+    },
+    {
+        "date": "2/12/2024",
+        "file": "prueba2.log"
+>>>>>>> 3e20361 (ultimos ajustes, al historial)
     }
 ]

@@ -10,11 +10,12 @@
 <div class="main-layout">
     <!-- Contenido principal -->
     <div class="container main-content d-flex flex-column justify-content-center align-items-center min-vh-100" data-file="{{ file_name }}">
+        <div class="text-end">
+            <button class="btn btn-success" onclick="saveTableContent()">Descargar</button>
+            <button class="btn btn-primary" onclick="saveChanges()">Guardar Cambios</button>
+            <button class="btn btn-success" onclick="historial(this)">Historial de Cambios</button>
+        </div>
         <div class="md-6">
-            <div class="col text-start">
-                <h2 class="title-sub">Visualización de Archivo Log</h2>
-            </div>
-
             <!-- Tabla para mostrar el contenido del archivo log -->
             <div class="table-responsive mb-3" style="max-height: 800px; overflow-y: auto;">
                 <table id="log-table" class="table table-striped table-bordered">
@@ -36,10 +37,7 @@
             <div class="pagination-container" id="pagination-controls"></div>
 
             <!-- Botón para guardar cambios en la tabla -->
-            <div class="text-end">
-                <button class="btn btn-success" onclick="saveTableContent()">Descargar</button>
-                <button class="btn btn-primary" onclick="saveChanges()">Guardar Cambios</button>
-            </div>
+
         </div>
     </div>
 

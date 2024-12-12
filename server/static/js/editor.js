@@ -565,3 +565,21 @@ function saveChanges() {
         showNotification('Error al guardar los cambios.');
     });
 }
+
+function historial(button) {
+    const container = button.closest('.main-content');
+    const fileName = container.getAttribute('data-file');
+
+    if (fileName) {
+        const url = `/file_history/${encodeURIComponent(fileName)}`;
+        
+        // Redirigir al usuario a la nueva página
+        window.location.href = url;
+    } else {
+        console.error("No se encontró el nombre del archivo.");
+        alert('No se pudo identificar el archivo.');
+    }
+}
+
+
+
