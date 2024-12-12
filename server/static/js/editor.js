@@ -23,9 +23,10 @@ function updateTable(data) {
     const paginatedData = paginate(data, currentPage); // Obtener datos paginados
     paginatedData.forEach((row, index) => {
         const tr = document.createElement('tr');
-        tr.setAttribute('data-first-value', row.first_value || ''); // Asignar atributo personalizado
+        tr.setAttribute('data-first-value', row.first_value); // Asignar atributo personalizado
 
         // Crear celdas
+
         const tipoEventoTd = document.createElement('td');
         tipoEventoTd.textContent = row.tipo_evento;
         tr.appendChild(tipoEventoTd);
@@ -214,8 +215,9 @@ function renderLogFile(filepath) {
             currentData = lines.map(line => {
                 const columns = line.split(',');
                 if (columns.length < 10) return null;
-
+            
                 return {
+                    first_value: columns[0], // Agregar este campo para almacenar el primer valor
                     tipo_evento: columns[2] === '01' ? 'Entrada' : columns[2] === '03' ? 'Salida' : 'Desconocido',
                     rut_encriptado: columns[3],
                     hora: `${columns[5]}:${columns[6]}`,
@@ -302,7 +304,7 @@ function formatTwoDigits(value) {
 function saveTableContent() {
     const logLines = currentData.map(row => {
         // Extraer el valor original desde el objeto en currentData
-        const firstValue = row.first_value;
+        var firstValue = row.first_value;
 
         // Convertir 'Entrada' o 'Salida' al código correspondiente
         const tipoEvento = row.tipo_evento === 'Entrada' ? '01' : row.tipo_evento === 'Salida' ? '03' : '00';
@@ -477,12 +479,13 @@ function showNotification(message) {
 }
 
 function addNewRecord() {
+    const reloj = document.getElementById('reloj').value; // Reloj seleccionado por el usuario
     const eventType = document.getElementById('event-type').value; // Tipo de evento (Entrada/Salida)
     const rut = document.getElementById('rut').value; // RUT ingresado por el usuario
     const time = document.getElementById('time').value; // Hora ingresada por el usuario
     const date = document.getElementById('date').value; // Fecha seleccionada desde el calendario
 
-    if (!eventType || !rut || !time || !date) {
+    if (!eventType || !rut || !time || !date || !reloj) {
         alert('Por favor, complete todos los campos.');
         return;
     }
@@ -494,6 +497,7 @@ function addNewRecord() {
 
     // Crear el nuevo registro
     const newRecord = {
+        first_value: reloj,
         tipo_evento: eventType,
         rut_encriptado: rut,
         hora: time,

@@ -37,7 +37,8 @@
 
             <!-- Botón para guardar cambios en la tabla -->
             <div class="text-end">
-                <button class="btn btn-success" onclick="saveTableContent()">Guardar Cambios</button>
+                <button class="btn btn-success" onclick="saveTableContent()">Descargar</button>
+                <button class="btn btn-primary" onclick="saveChanges()">Guardar Cambios</button>
             </div>
         </div>
     </div>
@@ -53,6 +54,18 @@
         <div class="add-record-section">
             <h4>Agregar Nuevo Registro</h4>
             <form id="add-record-form">
+                <div class = "form-group">
+                    <label for="event-type">Reloj</label>
+                    <select id="reloj" class="form-control">
+                        <option value="001">1</option>
+                        <option value="002">2</option>
+                        <option value="003">3</option>
+                        <option value="004">4</option>
+                        <option value="005">5</option>
+                        <option value="006">6</option>
+                        <option value="007">7</option>
+                        <option value="008">8</option>
+                    </select>
                 <div class="form-group">
                     <label for="event-type">Tipo de Evento</label>
                     <select id="event-type" class="form-control">

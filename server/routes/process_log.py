@@ -47,7 +47,7 @@ def upload_file():
         except Exception as e:
             print(f"Error: {str(e)}")
             return jsonify({'message': 'Error al guardar el archivo.'}), 500
-
+        
 
 @process_log_bp.route('/update_metadata', methods=['POST'])
 def update_metadata():
