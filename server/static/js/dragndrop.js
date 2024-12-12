@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Función para manejar el archivo seleccionado o arrastrado
+    // Función para manejar el archivo seleccionado o arrastrado
     async function handleFile() {
         try {
             const file = fileInput.files[0];
@@ -56,7 +57,12 @@ document.addEventListener('DOMContentLoaded', () => {
             await sendDateAndFileName(file.name);
 
             // Notificación de éxito
-            showNotification('Archivo procesado correctamente.');
+            showNotification('Archivo procesado correctamente. Refrescando página...');
+
+            // Esperar 1 segundo antes de refrescar la página
+            setTimeout(() => {
+                location.reload(); // Recargar la página
+            }, 2000);
         } catch (error) {
             // Notificación de error si algo falla
             showNotification('Error al procesar el archivo. Por favor, intenta de nuevo.');

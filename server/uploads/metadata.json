@@ -14,5 +14,17 @@
     {
         "date": "1/12/2024",
         "file": "prueba1.log"
+    },
+    {
+        "date": "12/12/2024",
+        "file": "test1.log"
+    },
+    {
+        "date": "13/12/2024",
+        "file": "test2.log"
+    },
+    {
+        "date": "14/12/2024",
+        "file": "test3.log"
     }
 ]
