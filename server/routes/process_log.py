@@ -48,6 +48,34 @@ def upload_file():
             print(f"Error: {str(e)}")
             return jsonify({'message': 'Error al guardar el archivo.'}), 500
         
+@process_log_bp.route('/save-changes', methods=['POST'])
+def save_changes():
+    data = request.json.get('data', [])
+    file_name = request.json.get('file_name', '')
+
+    if not data or not file_name:
+        return jsonify({'message': 'No se recibió ningún dato o el nombre del archivo no fue proporcionado.'}), 400
+
+    file_path = os.path.join(UPLOAD_FOLDER, file_name)
+
+    try:
+        with open(file_path, 'w') as file:
+            for row in data:
+                # Reconstruir cada línea en formato del archivo original
+                first_value = row['first_value']
+                tipo_evento = '01' if row['tipo_evento'] == 'Entrada' else '03'
+                hora, minuto = row['hora'].split(':')
+                dia, mes, anio = row['fecha'].split('/')
+
+                # Reconstruir línea
+                line = f"{first_value},01,{tipo_evento},{row['rut_encriptado']},0000000000,{hora},{minuto},{mes},{dia},{anio},00,00,00,00,00,0000000000,0000000000,    0.00,    0.00\n"
+                file.write(line)
+
+        return jsonify({'message': 'Cambios guardados exitosamente.'}), 200
+    except Exception as e:
+        print(f"Error al guardar cambios: {e}")
+        return jsonify({'message': 'Error al guardar los cambios.'}), 500
+        
 
 @process_log_bp.route('/update_metadata', methods=['POST'])
 def update_metadata():

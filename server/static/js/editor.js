@@ -533,3 +533,35 @@ function addNewRecord() {
     // Limpiar el formulario después de agregar el registro
     document.getElementById('add-record-form').reset();
 }
+
+function saveChanges() {
+    if (!currentData.length) {
+        showNotification('No hay datos para guardar.');
+        return;
+    }
+
+    // Obtener el nombre del archivo desde el atributo de datos en el contenedor
+    const fileName = document.querySelector('.container[data-file]').getAttribute('data-file');
+
+    if (!fileName) {
+        showNotification('No se especificó el archivo.');
+        return;
+    }
+
+    fetch('/save-changes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: currentData, file_name: fileName })
+    })
+    .then(response => response.json())
+    .then(result => {
+        showNotification(result.message);
+        if (result.message.includes('exitosamente')) {
+            console.log('Cambios guardados correctamente en el servidor.');
+        }
+    })
+    .catch(error => {
+        console.error('Error al guardar los cambios:', error);
+        showNotification('Error al guardar los cambios.');
+    });
+}
